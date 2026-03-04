@@ -1,0 +1,201 @@
+openapi: 3.0.3
+info:
+  title: API de Empleados
+  version: 1.0.0
+  description: CRUD de empleados con Spring Boot 3, Java 17, Basic Auth y PostgreSQL.
+servers:
+  - url: http://localhost:8080
+security:
+  - basicAuth: []
+paths:
+  /api/empleados:
+    get:
+      summary: Listar empleados
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Lista de empleados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Empleado'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Crear empleado
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmpleadoCreate'
+      responses:
+        '201':
+          description: Empleado creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Empleado'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /api/empleados/{clave}:
+    parameters:
+      - name: clave
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: '^EMP-[0-9]+$'
+    get:
+      summary: Obtener empleado por clave
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Empleado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Empleado'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: Actualizar empleado
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmpleadoUpdate'
+      responses:
+        '200':
+          description: Empleado actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Empleado'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Eliminar empleado
+      security:
+        - basicAuth: []
+      responses:
+        '204':
+          description: Empleado eliminado
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    Empleado:
+      type: object
+      required: [clave, nombre, direccion, telefono]
+      properties:
+        clave:
+          type: string
+          pattern: '^EMP-[0-9]+$'
+          example: EMP-1
+        nombre:
+          type: string
+          maxLength: 100
+          example: Ana Pérez
+        direccion:
+          type: string
+          maxLength: 100
+          example: Av. Central 123
+        telefono:
+          type: string
+          maxLength: 100
+          example: 555123456
+    EmpleadoCreate:
+      type: object
+      required: [nombre, direccion, telefono]
+      properties:
+        nombre:
+          type: string
+          maxLength: 100
+          example: Ana Pérez
+        direccion:
+          type: string
+          maxLength: 100
+          example: Av. Central 123
+        telefono:
+          type: string
+          maxLength: 100
+          example: 555123456
+    EmpleadoUpdate:
+      type: object
+      required: [nombre, direccion, telefono]
+      properties:
+        nombre:
+          type: string
+          maxLength: 100
+          example: Ana Gómez
+        direccion:
+          type: string
+          maxLength: 100
+          example: Calle 45
+        telefono:
+          type: string
+          maxLength: 100
+          example: 555000111
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+  responses:
+    BadRequest:
+      description: Solicitud inválida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: No autenticado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Conflicto por clave duplicada
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
