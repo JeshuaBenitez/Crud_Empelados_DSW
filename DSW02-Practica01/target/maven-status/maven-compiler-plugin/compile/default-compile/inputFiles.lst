@@ -3,6 +3,7 @@
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/config/SecurityConfig.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/controller/EmpleadoController.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/dto/CreateEmpleadoRequest.java
+/home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/dto/EmpleadoPageResponse.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/dto/EmpleadoResponse.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/dto/UpdateEmpleadoRequest.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/exception/BadRequestException.java

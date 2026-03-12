@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: ${APP_DB_USER:-postgres}
       POSTGRES_PASSWORD: ${APP_DB_PASSWORD:-postgres}
     ports:
-      - "${APP_DB_PORT:-5432}:5432"
+      - "${APP_DB_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -35,7 +35,7 @@ services:
       SPRING_FLYWAY_USER: ${APP_DB_USER:-postgres}
       SPRING_FLYWAY_PASSWORD: ${APP_DB_PASSWORD:-postgres}
       APP_BASIC_USER: ${APP_BASIC_USER:-admin}
-      APP_BASIC_PASSWORD: ${APP_BASIC_PASSWORD:-changeit}
+      APP_BASIC_PASSWORD: ${APP_BASIC_PASSWORD:-admin123}
     networks:
       - backend_net
 

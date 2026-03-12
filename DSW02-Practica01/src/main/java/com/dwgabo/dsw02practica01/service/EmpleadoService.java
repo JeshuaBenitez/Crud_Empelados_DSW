@@ -1,6 +1,7 @@
 package com.dwgabo.dsw02practica01.service;
 
 import com.dwgabo.dsw02practica01.dto.CreateEmpleadoRequest;
+import com.dwgabo.dsw02practica01.dto.EmpleadoPageResponse;
 import com.dwgabo.dsw02practica01.dto.EmpleadoResponse;
 import com.dwgabo.dsw02practica01.dto.UpdateEmpleadoRequest;
 import com.dwgabo.dsw02practica01.exception.ConflictException;
@@ -9,9 +10,11 @@ import com.dwgabo.dsw02practica01.model.Empleado;
 import com.dwgabo.dsw02practica01.model.EmpleadoId;
 import com.dwgabo.dsw02practica01.repository.EmpleadoRepository;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,6 +24,9 @@ public class EmpleadoService {
 
     private static final String PREFIJO = "EMP";
     private static final Pattern CLAVE_PATTERN = Pattern.compile("^EMP-(\\d+)$");
+    private static final int DEFAULT_PAGE = 0;
+    private static final int DEFAULT_SIZE = 10;
+    private static final int MAX_SIZE = 100;
 
     private final EmpleadoRepository empleadoRepository;
 
@@ -28,12 +34,28 @@ public class EmpleadoService {
         this.empleadoRepository = empleadoRepository;
     }
 
-    public List<EmpleadoResponse> listarTodos() {
-        List<EmpleadoResponse> response = new ArrayList<>();
-        for (Empleado empleado : empleadoRepository.findAll()) {
-            response.add(toResponse(empleado));
+    public EmpleadoPageResponse listar(int page, int size) {
+        if (page < 0) {
+            throw new IllegalArgumentException("El parámetro page debe ser mayor o igual a 0");
         }
+        if (size <= 0 || size > MAX_SIZE) {
+            throw new IllegalArgumentException("El parámetro size debe estar entre 1 y 100");
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Empleado> empleados = empleadoRepository.findAll(pageable);
+
+        EmpleadoPageResponse response = new EmpleadoPageResponse();
+        response.setContent(empleados.getContent().stream().map(this::toResponse).toList());
+        response.setPage(empleados.getNumber());
+        response.setSize(empleados.getSize());
+        response.setTotalElements(empleados.getTotalElements());
+        response.setTotalPages(empleados.getTotalPages());
         return response;
+    }
+
+    public EmpleadoPageResponse listarPorDefecto() {
+        return listar(DEFAULT_PAGE, DEFAULT_SIZE);
     }
 
     public EmpleadoResponse obtenerPorClave(String clave) {

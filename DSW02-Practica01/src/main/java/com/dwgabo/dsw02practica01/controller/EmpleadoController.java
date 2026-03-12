@@ -1,6 +1,7 @@
 package com.dwgabo.dsw02practica01.controller;
 
 import com.dwgabo.dsw02practica01.dto.CreateEmpleadoRequest;
+import com.dwgabo.dsw02practica01.dto.EmpleadoPageResponse;
 import com.dwgabo.dsw02practica01.dto.EmpleadoResponse;
 import com.dwgabo.dsw02practica01.dto.UpdateEmpleadoRequest;
 import com.dwgabo.dsw02practica01.service.EmpleadoService;
@@ -14,12 +15,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/empleados")
+@RequestMapping("/api/v1/empleados")
 public class EmpleadoController {
 
     private final EmpleadoService empleadoService;
@@ -29,8 +29,10 @@ public class EmpleadoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EmpleadoResponse>> listar() {
-        return ResponseEntity.ok(empleadoService.listarTodos());
+    public ResponseEntity<EmpleadoPageResponse> listar(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(empleadoService.listar(page, size));
     }
 
     @GetMapping("/{clave}")

@@ -36,3 +36,11 @@
 - `401 Unauthorized`: credenciales Basic Auth faltantes o inválidas.
 - `404 Not Found`: empleado inexistente en operaciones por `clave` (`EMP-<numero>`).
 - `409 Conflict`: intento de crear empleado con combinación de PK compuesta duplicada.
+
+## API Access & Query Model
+
+- Versionado obligatorio de rutas: `/api/v1/empleados`.
+- Seguridad de acceso: HTTP Basic con credenciales iniciales `admin` / `admin123`.
+- Listado paginado:
+  - Parámetros: `page` (entero >= 0), `size` (entero > 0).
+  - Comportamiento esperado: respuesta paginada para evitar listados masivos sin control.

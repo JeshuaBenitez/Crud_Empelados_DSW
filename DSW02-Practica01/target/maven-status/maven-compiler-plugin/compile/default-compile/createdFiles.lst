@@ -11,5 +11,5 @@ com/dwgabo/dsw02practica01/model/EmpleadoId.class
 com/dwgabo/dsw02practica01/config/OpenApiConfig.class
 com/dwgabo/dsw02practica01/controller/EmpleadoController.class
 com/dwgabo/dsw02practica01/repository/EmpleadoRepository.class
-com/dwgabo/dsw02practica01/model/Empleado.class
 com/dwgabo/dsw02practica01/exception/BadRequestException.class
+com/dwgabo/dsw02practica01/model/Empleado.class

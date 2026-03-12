@@ -1,33 +1,33 @@
-# Implementation Plan: CRUD de Empleados
+# Implementation Plan: CRUD de Empleados (API v1)
 
-**Branch**: `001-crud-empleados-spring-boot` | **Date**: 2026-02-26 | **Spec**: `/specs/001-crud-empleados-spring-boot/spec.md`
+**Branch**: `001-crud-empleados-spring-boot` | **Date**: 2026-03-09 | **Spec**: `/specs/001-crud-empleados-spring-boot/spec.md`
 **Input**: Feature specification from `/specs/001-crud-empleados-spring-boot/spec.md`
 
 ## Summary
 
-Implementar una API backend con Spring Boot 3 y Java 17 para CRUD de empleados con validaciones de campos, persistencia en PostgreSQL, autenticación HTTP Basic y documentación Swagger/OpenAPI. La solución usa una PK compuesta (`prefijo`, `numero`) y expone una clave lógica derivada con formato `EMP-<numero>`, manteniendo arquitectura por capas, migraciones Flyway y entorno local Docker para base de datos.
+Evolucionar el backend existente de empleados para exponer CRUD versionado en `/api/v1/empleados`, mantener clave lógica `EMP-<numero>` con PK compuesta, aplicar HTTP Basic con credenciales fijas `admin/admin123`, agregar paginación obligatoria en listado (`page=0`, `size=10`, `max=100`), mantener compatibilidad con Swagger/OpenAPI y conservar operación con Docker + PostgreSQL sin reconstruir el proyecto desde cero.
 
 ## Technical Context
 
 **Language/Version**: Java 17  
 **Primary Dependencies**: Spring Boot 3 (Web, Validation, Security, Data JPA), Flyway, PostgreSQL Driver, Springdoc OpenAPI  
-**Storage**: PostgreSQL 16 (Docker en local)  
+**Storage**: PostgreSQL 16 (Docker/Compose)  
 **Testing**: JUnit 5 + Spring Boot Test + MockMvc  
 **Target Platform**: Linux server / JVM 17  
 **Project Type**: Backend web-service monolítico  
-**Performance Goals**: Operaciones CRUD con tiempo de respuesta p95 < 300 ms en entorno local de desarrollo  
-**Constraints**: Basic Auth obligatoria en `/api/empleados/**`, longitud máxima 100 para `nombre`, `direccion`, `telefono`, PK compuesta (`prefijo`, `numero`), generación automática de clave lógica `EMP-<numero>`, duplicados de PK compuesta con `409 Conflict`  
-**Scale/Scope**: MVP de un módulo de empleados para operación interna (cientos a miles de registros)
+**Performance Goals**: N/A (no objetivo cuantitativo adicional en esta iteración)  
+**Constraints**: `/api/v1/empleados/**`, Basic Auth fija `admin/admin123`, paginación (`page=0`, `size=10`, `size<=100`), Swagger actualizado, Docker + PostgreSQL operativos  
+**Scale/Scope**: Ajuste incremental sobre módulo CRUD existente
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- **I. Runtime Base Inmutable**: PASS. Se usa Spring Boot 3 y Java 17 como stack único.
-- **II. Seguridad de Acceso Mínimo**: PASS. Endpoints de negocio protegidos por HTTP Basic con Spring Security.
-- **III. Persistencia PostgreSQL Containerizada**: PASS. Base de datos objetivo PostgreSQL y ejecución local por Docker Compose.
-- **IV. Contrato API en Swagger**: PASS. Se publicará OpenAPI y Swagger UI con operaciones y errores esperados.
-- **V. Calidad Verificable y Trazabilidad**: PASS. Se definen pruebas unitarias/integración y artefactos de diseño versionados.
+- **I. Runtime Base Inmutable**: PASS. Se mantiene Spring Boot 3 + Java 17 sin cambio de stack.
+- **II. Seguridad Básica Académica**: PASS. Se define HTTP Basic con credenciales fijas `admin/admin123`.
+- **III. Persistencia PostgreSQL Containerizada**: PASS. Se mantiene PostgreSQL con Docker Compose y compatibilidad local.
+- **IV. Contrato API Versionado en Swagger**: PASS. Se planifica actualización de endpoints a `/api/v1/...` y reflejo en OpenAPI.
+- **V. Calidad Verificable, Paginación y Trazabilidad**: PASS. Se incorporan pruebas para paginación, autenticación y contrato versionado.
 
 ## Project Structure
 
@@ -48,6 +48,7 @@ specs/001-crud-empleados-spring-boot/
 
 ```text
 DSW02-Practica01/
+├── Dockerfile
 ├── docker-compose.yml
 ├── pom.xml
 └── src/
@@ -55,6 +56,7 @@ DSW02-Practica01/
     │   ├── java/com/dwgabo/dsw02practica01/
     │   │   ├── config/
     │   │   ├── controller/
+    │   │   ├── dto/
     │   │   ├── exception/
     │   │   ├── model/
     │   │   ├── repository/
@@ -66,30 +68,31 @@ DSW02-Practica01/
     └── test/java/com/dwgabo/dsw02practica01/
 ```
 
-**Structure Decision**: Se adopta un backend monolítico Spring Boot en `DSW02-Practica01/` con separación por capas y documentación funcional en `specs/001-crud-empleados-spring-boot/`.
+**Structure Decision**: Se conserva la estructura actual y se aplican cambios incrementales de contrato/API sin reinicio de proyecto.
 
 ## Phase 0 - Research
 
-1. Confirmar estrategia de generación de clave lógica `EMP-<numero>` basada en PK compuesta y consecutivo autonumérico.
-2. Confirmar estrategia de manejo de errores REST para duplicados (`409 Conflict`) y no encontrados (`404`).
-3. Confirmar política de rechazo de clave manual enviada por cliente en operaciones de alta.
-4. Definir postura de seguridad para Swagger UI con endpoints documentados y autenticación para pruebas.
-5. Verificar compatibilidad de versiones Spring Boot 3, Java 17, PostgreSQL 16 y springdoc.
+1. Validar estrategia de versionado uniforme (`/api/v1/empleados`) para todos los endpoints CRUD.
+2. Confirmar política de autenticación fija `admin/admin123` en configuración de seguridad y pruebas.
+3. Definir comportamiento de paginación en listado: defaults y límites de validación.
+4. Confirmar impacto en documentación OpenAPI y ejemplos de quickstart.
+5. Verificar que dockerización de API + PostgreSQL no se rompe con los nuevos cambios.
 
 ## Phase 1 - Design
 
-1. Diseñar entidad `Empleado` con PK compuesta y clave lógica derivada.
-2. Diseñar contrato API CRUD y códigos de respuesta con clave `EMP-<numero>`.
-3. Diseñar migración inicial Flyway para tabla `empleados` con PK compuesta (`prefijo`, `numero`) y secuencia autonumérica.
-4. Definir quickstart reproducible con Docker + ejecución de aplicación.
+1. Ajustar contrato API para rutas versionadas y query params `page`/`size`.
+2. Diseñar respuesta de listado paginado y validaciones (`size <= 100`).
+3. Ajustar configuración de seguridad para credenciales académicas fijas.
+4. Actualizar documentación Swagger/OpenAPI y guía de ejecución Docker.
 
 ## Phase 2 - Task Planning Approach
 
-1. Crear tareas de infraestructura (dependencias, configuración, Docker, migraciones).
-2. Crear tareas por historia (P1, P2, P3) con pruebas asociadas.
-3. Añadir tareas de verificación de Swagger, seguridad y casos borde críticos.
-4. Incluir checklist final de build + pruebas + validación manual mínima.
+1. Crear tareas de refactor de rutas en controller/service y pruebas asociadas.
+2. Crear tareas de paginación en endpoint GET de listado y validación de parámetros.
+3. Crear tareas de alineación de seguridad (`admin/admin123`) y pruebas de acceso.
+4. Crear tareas de actualización Swagger, quickstart y verificación Docker + PostgreSQL.
+5. Incluir verificación final de build, pruebas y smoke test en contenedores.
 
 ## Complexity Tracking
 
-No se identifican violaciones constitucionales ni complejidad adicional que requiera justificación.
+No se requiere complejidad adicional fuera del alcance incremental definido.

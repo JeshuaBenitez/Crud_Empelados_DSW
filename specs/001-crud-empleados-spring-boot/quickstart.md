@@ -22,24 +22,24 @@ Desde `DSW02-Practica01/`:
 export APP_DB_USER=postgres
 export APP_DB_PASSWORD=postgres
 export APP_BASIC_USER=admin
-export APP_BASIC_PASSWORD='tu-password-segura'
+export APP_BASIC_PASSWORD=admin123
 mvn spring-boot:run
 ```
 
 ## 3) Probar Swagger
 
 - URL: `http://localhost:8080/swagger-ui.html`
-- Usuario Basic Auth: valor de `APP_BASIC_USER`
-- Password Basic Auth: valor de `APP_BASIC_PASSWORD`
+- Usuario Basic Auth: `admin`
+- Password Basic Auth: `admin123`
 
 ## 4) Probar endpoints principales
 
-Base URL: `http://localhost:8080/api/empleados`
+Base URL: `http://localhost:8080/api/v1/empleados`
 
 ### Crear empleado
 
 ```bash
-curl -u "$APP_BASIC_USER:$APP_BASIC_PASSWORD" -X POST "http://localhost:8080/api/empleados" \
+curl -u "admin:admin123" -X POST "http://localhost:8080/api/v1/empleados" \
   -H "Content-Type: application/json" \
   -d '{"nombre":"Ana Pérez","direccion":"Av. Central 123","telefono":"555123456"}'
 ```
@@ -47,19 +47,19 @@ curl -u "$APP_BASIC_USER:$APP_BASIC_PASSWORD" -X POST "http://localhost:8080/api
 ### Listar empleados
 
 ```bash
-curl -u "$APP_BASIC_USER:$APP_BASIC_PASSWORD" "http://localhost:8080/api/empleados"
+curl -u "admin:admin123" "http://localhost:8080/api/v1/empleados?page=0&size=10"
 ```
 
 ### Obtener por clave
 
 ```bash
-curl -u "$APP_BASIC_USER:$APP_BASIC_PASSWORD" "http://localhost:8080/api/empleados/EMP-1"
+curl -u "admin:admin123" "http://localhost:8080/api/v1/empleados/EMP-1"
 ```
 
 ### Actualizar
 
 ```bash
-curl -u "$APP_BASIC_USER:$APP_BASIC_PASSWORD" -X PUT "http://localhost:8080/api/empleados/EMP-1" \
+curl -u "admin:admin123" -X PUT "http://localhost:8080/api/v1/empleados/EMP-1" \
   -H "Content-Type: application/json" \
   -d '{"nombre":"Ana Gómez","direccion":"Calle 45","telefono":"555000111"}'
 ```
@@ -67,5 +67,5 @@ curl -u "$APP_BASIC_USER:$APP_BASIC_PASSWORD" -X PUT "http://localhost:8080/api/
 ### Eliminar
 
 ```bash
-curl -u "$APP_BASIC_USER:$APP_BASIC_PASSWORD" -X DELETE "http://localhost:8080/api/empleados/EMP-1"
+curl -u "admin:admin123" -X DELETE "http://localhost:8080/api/v1/empleados/EMP-1"
 ```

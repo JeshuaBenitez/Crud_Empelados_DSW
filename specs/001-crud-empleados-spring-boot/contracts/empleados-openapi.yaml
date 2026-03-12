@@ -8,20 +8,36 @@ servers:
 security:
   - basicAuth: []
 paths:
-  /api/empleados:
+  /api/v1/empleados:
     get:
       summary: Listar empleados
       security:
         - basicAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
       responses:
         '200':
-          description: Lista de empleados
+          description: Lista paginada de empleados
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Empleado'
+                $ref: '#/components/schemas/EmpleadoPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
     post:
@@ -47,7 +63,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '409':
           $ref: '#/components/responses/Conflict'
-  /api/empleados/{clave}:
+  /api/v1/empleados/{clave}:
     parameters:
       - name: clave
         in: path
@@ -110,6 +126,27 @@ components:
       type: http
       scheme: basic
   schemas:
+    EmpleadoPage:
+      type: object
+      required: [content, page, size, totalElements, totalPages]
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Empleado'
+        page:
+          type: integer
+          example: 0
+        size:
+          type: integer
+          example: 10
+        totalElements:
+          type: integer
+          format: int64
+          example: 25
+        totalPages:
+          type: integer
+          example: 3
     Empleado:
       type: object
       required: [clave, nombre, direccion, telefono]
