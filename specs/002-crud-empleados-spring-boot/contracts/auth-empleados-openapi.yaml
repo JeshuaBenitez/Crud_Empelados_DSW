@@ -1,0 +1,72 @@
+openapi: 3.0.3
+info:
+  title: API Auth Empleados
+  version: 2.0.0
+  description: Contrato de autenticacion de empleados por correo/password con JWT. En iteracion 002, POST /api/v1/empleados permanece fuera de alcance y responde 403.
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/v1/auth/empleados/login:
+    post:
+      summary: Login de empleado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [correo, password]
+              properties:
+                correo:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                  tokenType:
+                    type: string
+                    example: Bearer
+                  expiresIn:
+                    type: integer
+                    format: int64
+        '400':
+          description: Payload inválido
+        '401':
+          description: Credenciales inválidas
+  /api/v1/empleados:
+    post:
+      summary: Alta de empleado (fuera de alcance en iteracion 002)
+      description: Endpoint bloqueado en esta iteracion para evitar considerar CRUD completo de empleados.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                direccion:
+                  type: string
+                telefono:
+                  type: string
+      responses:
+        '403':
+          description: Operacion no permitida en iteracion 002
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

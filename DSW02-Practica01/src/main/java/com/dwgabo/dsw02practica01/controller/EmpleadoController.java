@@ -6,7 +6,8 @@ import com.dwgabo.dsw02practica01.dto.EmpleadoResponse;
 import com.dwgabo.dsw02practica01.dto.UpdateEmpleadoRequest;
 import com.dwgabo.dsw02practica01.service.EmpleadoService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,29 +32,31 @@ public class EmpleadoController {
     @GetMapping
     public ResponseEntity<EmpleadoPageResponse> listar(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(empleadoService.listar(page, size));
+            @RequestParam(defaultValue = "10") int size,
+            Authentication authentication) {
+        return ResponseEntity.ok(empleadoService.listarPropio(authentication.getName(), page, size));
     }
 
     @GetMapping("/{clave}")
-    public ResponseEntity<EmpleadoResponse> obtener(@PathVariable String clave) {
-        return ResponseEntity.ok(empleadoService.obtenerPorClave(clave));
+    public ResponseEntity<EmpleadoResponse> obtener(@PathVariable String clave, Authentication authentication) {
+        return ResponseEntity.ok(empleadoService.obtenerPorClave(clave, authentication.getName()));
     }
 
     @PostMapping
     public ResponseEntity<EmpleadoResponse> crear(@Valid @RequestBody CreateEmpleadoRequest empleado) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(empleadoService.crear(empleado));
+        throw new AccessDeniedException("No tienes permiso para crear empleados desde esta ruta");
     }
 
     @PutMapping("/{clave}")
     public ResponseEntity<EmpleadoResponse> actualizar(@PathVariable String clave,
-                                                       @Valid @RequestBody UpdateEmpleadoRequest empleado) {
-        return ResponseEntity.ok(empleadoService.actualizar(clave, empleado));
+                                                       @Valid @RequestBody UpdateEmpleadoRequest empleado,
+                                                       Authentication authentication) {
+        return ResponseEntity.ok(empleadoService.actualizar(clave, empleado, authentication.getName()));
     }
 
     @DeleteMapping("/{clave}")
-    public ResponseEntity<Void> eliminar(@PathVariable String clave) {
-        empleadoService.eliminar(clave);
+    public ResponseEntity<Void> eliminar(@PathVariable String clave, Authentication authentication) {
+        empleadoService.eliminar(clave, authentication.getName());
         return ResponseEntity.noContent().build();
     }
 }

@@ -30,6 +30,15 @@ public class Empleado {
     @Column(name = "telefono", nullable = false, length = 100)
     private String telefono;
 
+    @Column(name = "correo", nullable = false, length = 150)
+    private String correo;
+
+    @Column(name = "password_hash", nullable = false, length = 100)
+    private String passwordHash;
+
+    @Column(name = "activo", nullable = false)
+    private Boolean activo;
+
     public EmpleadoId getId() {
         return id;
     }
@@ -68,5 +77,29 @@ public class Empleado {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 }

@@ -12,10 +12,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -58,15 +56,15 @@ class EmpleadoServiceUs1Test {
     void listar_devuelvePaginacionConMetadata() {
         Empleado empleado = new Empleado();
         empleado.setId(new EmpleadoId("EMP", 7L));
+        empleado.setCorreo("empleado.demo@empresa.com");
         empleado.setNombre("Luis");
         empleado.setDireccion("Calle 7");
         empleado.setTelefono("555777");
 
-        PageRequest pageRequest = PageRequest.of(0, 10);
-        when(empleadoRepository.findAll(pageRequest))
-                .thenReturn(new PageImpl<>(List.of(empleado), pageRequest, 1));
+        when(empleadoRepository.findByCorreoIgnoreCase("empleado.demo@empresa.com"))
+            .thenReturn(Optional.of(empleado));
 
-        EmpleadoPageResponse response = empleadoService.listar(0, 10);
+        EmpleadoPageResponse response = empleadoService.listarPropio("empleado.demo@empresa.com", 0, 10);
 
         assertEquals(0, response.getPage());
         assertEquals(10, response.getSize());
@@ -77,10 +75,12 @@ class EmpleadoServiceUs1Test {
 
     @Test
     void listar_rechazaPaginacionInvalida() {
-        IllegalArgumentException ex1 = assertThrows(IllegalArgumentException.class, () -> empleadoService.listar(-1, 10));
+        IllegalArgumentException ex1 = assertThrows(IllegalArgumentException.class,
+            () -> empleadoService.listarPropio("empleado.demo@empresa.com", -1, 10));
         assertEquals("El parámetro page debe ser mayor o igual a 0", ex1.getMessage());
 
-        IllegalArgumentException ex2 = assertThrows(IllegalArgumentException.class, () -> empleadoService.listar(0, 101));
+        IllegalArgumentException ex2 = assertThrows(IllegalArgumentException.class,
+            () -> empleadoService.listarPropio("empleado.demo@empresa.com", 0, 101));
         assertEquals("El parámetro size debe estar entre 1 y 100", ex2.getMessage());
     }
 }

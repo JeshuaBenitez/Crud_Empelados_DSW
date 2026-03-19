@@ -1,10 +1,13 @@
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/Dsw02Practica01Application.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/config/OpenApiConfig.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/config/SecurityConfig.java
+/home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/controller/AuthController.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/controller/EmpleadoController.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/dto/CreateEmpleadoRequest.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/dto/EmpleadoPageResponse.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/dto/EmpleadoResponse.java
+/home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/dto/LoginEmpleadoRequest.java
+/home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/dto/LoginEmpleadoResponse.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/dto/UpdateEmpleadoRequest.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/exception/BadRequestException.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/exception/ConflictException.java
@@ -13,4 +16,7 @@
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/model/Empleado.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/model/EmpleadoId.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/repository/EmpleadoRepository.java
+/home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/security/JwtAuthenticationFilter.java
+/home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/security/JwtTokenProvider.java
+/home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/service/AuthService.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/service/EmpleadoService.java

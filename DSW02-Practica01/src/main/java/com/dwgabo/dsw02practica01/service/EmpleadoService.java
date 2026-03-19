@@ -10,7 +10,9 @@ import com.dwgabo.dsw02practica01.model.Empleado;
 import com.dwgabo.dsw02practica01.model.EmpleadoId;
 import com.dwgabo.dsw02practica01.repository.EmpleadoRepository;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,7 @@ public class EmpleadoService {
         this.empleadoRepository = empleadoRepository;
     }
 
-    public EmpleadoPageResponse listar(int page, int size) {
+    public EmpleadoPageResponse listarPropio(String correoAutenticado, int page, int size) {
         if (page < 0) {
             throw new IllegalArgumentException("El parámetro page debe ser mayor o igual a 0");
         }
@@ -42,8 +44,11 @@ public class EmpleadoService {
             throw new IllegalArgumentException("El parámetro size debe estar entre 1 y 100");
         }
 
+        Empleado propio = empleadoRepository.findByCorreoIgnoreCase(correoAutenticado)
+                .orElseThrow(() -> new ResourceNotFoundException("Empleado autenticado no encontrado"));
+
         Pageable pageable = PageRequest.of(page, size);
-        Page<Empleado> empleados = empleadoRepository.findAll(pageable);
+        Page<Empleado> empleados = new PageImpl<>(List.of(propio), pageable, 1);
 
         EmpleadoPageResponse response = new EmpleadoPageResponse();
         response.setContent(empleados.getContent().stream().map(this::toResponse).toList());
@@ -54,13 +59,15 @@ public class EmpleadoService {
         return response;
     }
 
-    public EmpleadoPageResponse listarPorDefecto() {
-        return listar(DEFAULT_PAGE, DEFAULT_SIZE);
+    public EmpleadoPageResponse listarPorDefecto(String correoAutenticado) {
+        return listarPropio(correoAutenticado, DEFAULT_PAGE, DEFAULT_SIZE);
     }
 
-    public EmpleadoResponse obtenerPorClave(String clave) {
+    public EmpleadoResponse obtenerPorClave(String clave, String correoAutenticado) {
         EmpleadoId id = parseClave(clave);
-        return toResponse(obtenerPorId(id, clave));
+        Empleado empleado = obtenerPorId(id, clave);
+        validarAccesoPropio(empleado, correoAutenticado);
+        return toResponse(empleado);
     }
 
     public EmpleadoResponse crear(CreateEmpleadoRequest request) {
@@ -82,18 +89,20 @@ public class EmpleadoService {
         }
     }
 
-    public EmpleadoResponse actualizar(String clave, UpdateEmpleadoRequest empleadoActualizado) {
+    public EmpleadoResponse actualizar(String clave, UpdateEmpleadoRequest empleadoActualizado, String correoAutenticado) {
         EmpleadoId id = parseClave(clave);
         Empleado existente = obtenerPorId(id, clave);
+        validarAccesoPropio(existente, correoAutenticado);
         existente.setNombre(empleadoActualizado.getNombre());
         existente.setDireccion(empleadoActualizado.getDireccion());
         existente.setTelefono(empleadoActualizado.getTelefono());
         return toResponse(empleadoRepository.save(existente));
     }
 
-    public void eliminar(String clave) {
+    public void eliminar(String clave, String correoAutenticado) {
         EmpleadoId id = parseClave(clave);
         Empleado existente = obtenerPorId(id, clave);
+        validarAccesoPropio(existente, correoAutenticado);
         empleadoRepository.delete(existente);
     }
 
@@ -109,6 +118,12 @@ public class EmpleadoService {
         }
         Long numero = Long.parseLong(matcher.group(1));
         return new EmpleadoId(PREFIJO, numero);
+    }
+
+    private void validarAccesoPropio(Empleado empleado, String correoAutenticado) {
+        if (empleado.getCorreo() == null || !empleado.getCorreo().equalsIgnoreCase(correoAutenticado)) {
+            throw new AccessDeniedException("No tienes permiso para acceder a este recurso");
+        }
     }
 
     private EmpleadoResponse toResponse(Empleado empleado) {
