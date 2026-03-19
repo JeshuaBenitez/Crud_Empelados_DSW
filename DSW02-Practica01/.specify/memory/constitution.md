@@ -1,30 +1,33 @@
 <!--
 Sync Impact Report
-- Version change: 2.1.0 -> 2.2.0
+- Version change: 2.2.0 -> 2.3.0
 - Modified principles:
-	- II. Seguridad Evolutiva por Iteraciones -> II. Seguridad Evolutiva y Compatibilidad por Iteraciones
-	- III. Persistencia PostgreSQL Containerizada (aclaraciones para dominio Departamentos)
-	- V. Calidad Verificable, Paginación y Trazabilidad (cobertura de relaciones entre agregados)
+	- I. Runtime Base Inmutable -> I. Runtime Base Inmutable y Bimodal
+	- II. Seguridad Evolutiva y Compatibilidad por Iteraciones (extensión de flujo JWT para frontend)
+	- IV. Contrato API Versionado en Swagger (consumo contractual desde frontend)
+	- V. Calidad Verificable, Paginación y Trazabilidad (cobertura E2E frontend con Cypress)
 - Added sections:
-	- Reglas de Evolución del Dominio (Iteración 003)
+	- Reglas de Evolución Frontend (Iteración 004)
 - Removed sections:
 	- Ninguna
 - Templates requiring updates:
-	- ⚠ pendiente de verificación en siguiente paso de speckit.constitution
+	- ⚠ pendiente de verificación para plantillas que referencian stack único backend
 - Deferred TODOs:
-	- Sincronizar plantillas tras confirmar alcance final de Iteración 003
+	- Sincronizar plantillas tras confirmar alcance final de Iteración 004
 -->
 
 # DSW02-Practica01 Constitution
 
 ## Core Principles
 
-### I. Runtime Base Inmutable
-Todo componente backend MUST ejecutarse sobre Spring Boot 3 y Java 17. Las nuevas
-funcionalidades MUST mantenerse dentro del stack estándar de Spring (Spring Web,
-Spring Security, Spring Data JPA cuando aplique) y MUST evitar mezclas de frameworks
-que dupliquen responsabilidades de runtime.
-Rationale: un runtime único reduce riesgo operativo, deuda técnica y fricción de mantenimiento.
+### I. Runtime Base Inmutable y Bimodal
+El backend MUST ejecutarse sobre Spring Boot 3 y Java 17, manteniendo el stack estándar
+de Spring (Spring Web, Spring Security, Spring Data JPA cuando aplique). El frontend
+MUST implementarse con Angular 22 LTS y MUST residir en `frontend-angular/` como módulo
+del mismo repositorio.
+Las nuevas funcionalidades MUST respetar esta separación de responsabilidades
+(frontend UI + backend API) y MUST evitar duplicar lógica de negocio del backend en el cliente.
+Rationale: una base bimodal explícita reduce acoplamiento, preserva mantenibilidad y habilita evolución incremental sin rehacer arquitectura existente.
 
 ### II. Seguridad Evolutiva y Compatibilidad por Iteraciones
 Todo endpoint no público MUST permanecer protegido por Spring Security y la estrategia
@@ -37,6 +40,9 @@ de autenticación MUST evolucionar por iteración funcional.
 - En iteración 003, los nuevos endpoints de departamentos MUST conservar compatibilidad
 	con el esquema de autenticación vigente (JWT para negocio de empleados y reglas
 	administrativas existentes), salvo enmienda explícita de seguridad.
+- En iteración 004, el frontend MUST autenticarse usando el endpoint de login de empleados
+	ya existente y MUST consumir recursos protegidos usando el JWT emitido por backend,
+	sin introducir mecanismos de autenticación paralelos ni credenciales hardcodeadas.
 - La autenticación de empleados MUST validar credenciales contra datos persistidos y
 	MUST almacenar contraseñas con hash seguro (nunca texto plano).
 - La opción JWT MAY adoptarse en iteración 002 cuando mejore separación entre login de
@@ -61,6 +67,8 @@ debe declarar operación, parámetros, respuestas esperadas y códigos de error.
 MUST incluir versionado explícito de rutas (por ejemplo `/api/v1/...`). Ningún cambio
 de contrato se considera completo sin actualización de la documentación Swagger y
 validación de consistencia con la implementación.
+El frontend de iteración 004 MUST consumir exclusivamente endpoints versionados y
+documentados, alineando payloads y códigos de respuesta con el contrato OpenAPI vigente.
 Rationale: versionar explícitamente evita ruptura de clientes y mejora gobernanza del API.
 
 ### V. Calidad Verificable, Paginación y Trazabilidad
@@ -72,6 +80,9 @@ endpoint de listado GET MUST soportar paginación explícita y documentada.
 Cuando se agreguen relaciones entre agregados (ej. Empleado-Departamento), las
 pruebas MUST cubrir integridad referencial, comportamiento CRUD y regresión de
 casos existentes de iteraciones previas.
+En iteración 004, la capa frontend MUST incorporar pruebas automatizadas con Cypress
+para flujos críticos (login, navegación principal y operaciones CRUD clave), en
+proporción al riesgo de regresión.
 Rationale: sin evidencia verificable y sin control de volumen en listados no existe criterio objetivo de completitud.
 
 ## Alcance por Iteracion
@@ -84,11 +95,24 @@ Rationale: sin evidencia verificable y sin control de volumen en listados no exi
 	proyecto existente. MUST ejecutarse de forma incremental, sin regenerar el proyecto
 	y sin alterar la base funcional de iteración 002 más allá de lo estrictamente
 	necesario para modelar la relación.
+- Iteracion 004 (`004-frontend-angular`): implementación del frontend en Angular 22 LTS
+	en `frontend-angular/`, con especificación en `specs/004-frontend-angular/`, consumo
+	de API backend existente, flujo de login de empleados y pantallas para login,
+	CRUD de empleados y CRUD de departamentos. La evolución MUST ser incremental,
+	sin regenerar backend ni reestructurar innecesariamente el repositorio.
 
 ## Restricciones Técnicas Obligatorias
 
 - El proyecto backend MUST estructurarse como servicio web Spring Boot.
 - Java MUST fijarse en versión 17 en build y runtime.
+- El frontend MUST implementarse con Angular 22 LTS dentro de `frontend-angular/`.
+- La especificación de frontend MUST mantenerse en `specs/004-frontend-angular/`.
+- El frontend MUST consumir la API existente del backend y MUST respetar rutas versionadas.
+- El flujo de autenticación frontend MUST usar `POST /api/v1/auth/empleados/login`.
+- El frontend MUST gestionar JWT de forma compatible con la seguridad backend vigente.
+- El frontend MUST incluir pantallas de login, CRUD de empleados y CRUD de departamentos.
+- El frontend MUST usar Tailwind CSS como base de interfaz.
+- La iteración frontend MUST contemplar pruebas E2E con Cypress.
 - La autenticación básica MUST aplicarse al menos a rutas de negocio y administración.
 - El acceso básico MUST operar con usuario `admin` y contraseña `admin123`.
 - La iteración 002 MUST implementar autenticación de empleados por `correo` y `password`
@@ -104,6 +128,8 @@ Rationale: sin evidencia verificable y sin control de volumen en listados no exi
 	formato del token, expiración y respuestas de error.
 - PostgreSQL MUST ser el motor de datos por defecto para cualquier módulo persistente.
 - Docker MUST proveer entorno reproducible para base de datos en desarrollo.
+- La integración frontend-backend MUST mantener compatibilidad con JWT, Docker y arquitectura existente.
+- La evolución de iteración 004 MUST NOT regenerar backend ni alterar su estructura base sin justificación aprobada en especificación.
 - Swagger/OpenAPI MUST estar habilitado en ambientes no productivos como mínimo.
 - Los endpoints HTTP MUST incluir versión explícita en la ruta (`/v1` o equivalente).
 - Los endpoints GET de listado MUST exponer parámetros de paginación.
@@ -119,17 +145,34 @@ Rationale: sin evidencia verificable y sin control de volumen en listados no exi
 - Ninguna migración de Iteración 003 MUST modificar retrospectivamente migraciones ya
 	aplicadas de iteraciones 001/002.
 
+## Reglas de Evolución Frontend (Iteración 004)
+
+- La iteración 004 MUST tratarse como expansión del proyecto existente, no como
+	reemplazo del backend ni reconstrucción del repositorio.
+- Toda funcionalidad de UI MUST mapearse explícitamente a capacidades backend
+	existentes antes de proponer nuevos endpoints.
+- El frontend MUST centralizar configuración de URL base API por entorno para
+	compatibilidad local y containerizada.
+- La gestión de sesión JWT en frontend MUST considerar expiración, manejo de 401
+	y cierre de sesión coherente con seguridad backend.
+- Tailwind CSS MUST aplicarse como sistema base de estilos, preservando consistencia
+	visual y mantenibilidad.
+
 ## Flujo de Entrega y Puertas de Calidad
 
 1. Toda especificación MUST declarar requisitos de seguridad (Basic Auth), persistencia
 	(PostgreSQL) y contrato API (Swagger + versionado explícito).
    En iteración 002 MUST incluir login de empleados por correo/password persistido.
 	En iteración 003 MUST incluir relación Empleado-Departamento y CRUD de departamentos.
+   En iteración 004 MUST incluir alcance de frontend Angular 22, consumo API existente,
+	flujo JWT de empleados, uso de Tailwind y estrategia de pruebas Cypress.
 2. Todo plan MUST incluir un Constitution Check explícito para stack, seguridad,
 	base de datos containerizada y documentación API.
 3. Toda lista de tareas MUST contemplar configuración Docker/PostgreSQL, seguridad,
 	documentación Swagger, versionado de endpoints, paginación y pruebas.
    En iteración 002 MUST contemplar pruebas de autenticación exitosa/fallida de empleados.
+   En iteración 004 MUST contemplar scaffolding frontend, integración con backend,
+	flujos CRUD en UI y pruebas E2E críticas.
 4. Ningún cambio pasa a implementación final si falla compilación, pruebas críticas o
 	verificación manual mínima de endpoints documentados.
 
@@ -145,6 +188,9 @@ Rationale: sin evidencia verificable y sin control de volumen en listados no exi
 	inicio de CRUD de departamentos.
 - La iteración 003 MUST iniciarse con actualización constitucional y luego continuar con
 	`/speckit.specify` sobre el alcance incremental de Departamentos.
+- La iteración 004 MUST iniciar con esta enmienda constitucional y luego continuar con
+	`/speckit.specify` sobre el alcance incremental del frontend, sin reabrir decisiones
+	resueltas de iteraciones 001-003 salvo conflicto explícito.
 
 ## Governance
 
@@ -162,4 +208,4 @@ Proceso de enmienda y cumplimiento:
 - Si un directorio obligatorio de plantillas no existe, MUST registrarse en el Sync Impact Report.
 - La revisión de cumplimiento MUST ejecutarse en planificación y antes de cerrar tareas.
 
-**Version**: 2.2.0 | **Ratified**: 2026-02-26 | **Last Amended**: 2026-03-19
+**Version**: 2.3.0 | **Ratified**: 2026-02-26 | **Last Amended**: 2026-03-19
