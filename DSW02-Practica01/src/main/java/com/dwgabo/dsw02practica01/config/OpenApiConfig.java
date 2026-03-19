@@ -14,9 +14,9 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("API de Empleados")
-                        .version("2.0")
-                        .description("CRUD de empleados con autenticación JWT por correo/password y Basic administrativo"))
+                        .title("API de Empleados y Departamentos")
+                        .version("3.0")
+                        .description("CRUD de empleados y departamentos con autenticación JWT por correo/password y Basic administrativo"))
                 .components(new Components()
                         .addSecuritySchemes("basicAuth",
                                 new SecurityScheme()

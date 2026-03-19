@@ -6,6 +6,8 @@ public class EmpleadoResponse {
     private String nombre;
     private String direccion;
     private String telefono;
+    private String departamentoClave;
+    private String departamentoNombre;
 
     public String getClave() {
         return clave;
@@ -37,5 +39,21 @@ public class EmpleadoResponse {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
+    }
+
+    public String getDepartamentoClave() {
+        return departamentoClave;
+    }
+
+    public void setDepartamentoClave(String departamentoClave) {
+        this.departamentoClave = departamentoClave;
+    }
+
+    public String getDepartamentoNombre() {
+        return departamentoNombre;
+    }
+
+    public void setDepartamentoNombre(String departamentoNombre) {
+        this.departamentoNombre = departamentoNombre;
     }
 }

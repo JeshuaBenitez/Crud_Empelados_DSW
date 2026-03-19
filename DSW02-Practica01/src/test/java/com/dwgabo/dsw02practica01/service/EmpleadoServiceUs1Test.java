@@ -3,6 +3,8 @@ package com.dwgabo.dsw02practica01.service;
 import com.dwgabo.dsw02practica01.dto.CreateEmpleadoRequest;
 import com.dwgabo.dsw02practica01.dto.EmpleadoPageResponse;
 import com.dwgabo.dsw02practica01.dto.EmpleadoResponse;
+import com.dwgabo.dsw02practica01.model.Departamento;
+import com.dwgabo.dsw02practica01.model.DepartamentoId;
 import com.dwgabo.dsw02practica01.model.Empleado;
 import com.dwgabo.dsw02practica01.model.EmpleadoId;
 import com.dwgabo.dsw02practica01.repository.EmpleadoRepository;
@@ -60,6 +62,10 @@ class EmpleadoServiceUs1Test {
         empleado.setNombre("Luis");
         empleado.setDireccion("Calle 7");
         empleado.setTelefono("555777");
+        Departamento departamento = new Departamento();
+        departamento.setId(new DepartamentoId("DEP", 2L));
+        departamento.setNombre("Operaciones");
+        empleado.setDepartamento(departamento);
 
         when(empleadoRepository.findByCorreoIgnoreCase("empleado.demo@empresa.com"))
             .thenReturn(Optional.of(empleado));
@@ -71,6 +77,8 @@ class EmpleadoServiceUs1Test {
         assertEquals(1, response.getTotalElements());
         assertEquals(1, response.getTotalPages());
         assertEquals("EMP-7", response.getContent().get(0).getClave());
+        assertEquals("DEP-2", response.getContent().get(0).getDepartamentoClave());
+        assertEquals("Operaciones", response.getContent().get(0).getDepartamentoNombre());
     }
 
     @Test

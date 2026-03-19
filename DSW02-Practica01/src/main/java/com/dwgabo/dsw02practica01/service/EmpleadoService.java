@@ -6,6 +6,7 @@ import com.dwgabo.dsw02practica01.dto.EmpleadoResponse;
 import com.dwgabo.dsw02practica01.dto.UpdateEmpleadoRequest;
 import com.dwgabo.dsw02practica01.exception.ConflictException;
 import com.dwgabo.dsw02practica01.exception.ResourceNotFoundException;
+import com.dwgabo.dsw02practica01.model.Departamento;
 import com.dwgabo.dsw02practica01.model.Empleado;
 import com.dwgabo.dsw02practica01.model.EmpleadoId;
 import com.dwgabo.dsw02practica01.repository.EmpleadoRepository;
@@ -132,6 +133,11 @@ public class EmpleadoService {
         response.setNombre(empleado.getNombre());
         response.setDireccion(empleado.getDireccion());
         response.setTelefono(empleado.getTelefono());
+        Departamento departamento = empleado.getDepartamento();
+        if (departamento != null) {
+            response.setDepartamentoClave(departamento.getClave());
+            response.setDepartamentoNombre(departamento.getNombre());
+        }
         return response;
     }
 }

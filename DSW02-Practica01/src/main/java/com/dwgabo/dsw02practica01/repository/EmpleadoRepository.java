@@ -4,6 +4,7 @@ import com.dwgabo.dsw02practica01.model.Empleado;
 import com.dwgabo.dsw02practica01.model.EmpleadoId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -13,4 +14,7 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, EmpleadoId> 
 	Long nextNumero();
 
 	Optional<Empleado> findByCorreoIgnoreCase(String correo);
+
+	@Query(value = "SELECT EXISTS(SELECT 1 FROM empleados WHERE departamento_prefijo = :prefijo AND departamento_numero = :numero)", nativeQuery = true)
+	boolean existsByDepartamento(@Param("prefijo") String prefijo, @Param("numero") Long numero);
 }

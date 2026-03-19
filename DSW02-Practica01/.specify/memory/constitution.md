@@ -1,27 +1,18 @@
 <!--
 Sync Impact Report
-- Version change: 2.0.0 -> 2.1.0
+- Version change: 2.1.0 -> 2.2.0
 - Modified principles:
-	- [PRINCIPLE_1_NAME] -> I. Runtime Base Inmutable
-	- II. Seguridad Basica Academica -> II. Seguridad Evolutiva por Iteraciones
-	- [PRINCIPLE_3_NAME] -> III. Persistencia PostgreSQL Containerizada
-	- [PRINCIPLE_4_NAME] -> IV. Contrato API Versionado en Swagger
-	- [PRINCIPLE_5_NAME] -> V. Calidad Verificable, Paginación y Trazabilidad
+	- II. Seguridad Evolutiva por Iteraciones -> II. Seguridad Evolutiva y Compatibilidad por Iteraciones
+	- III. Persistencia PostgreSQL Containerizada (aclaraciones para dominio Departamentos)
+	- V. Calidad Verificable, Paginación y Trazabilidad (cobertura de relaciones entre agregados)
 - Added sections:
-	- Alcance por Iteracion
-	- Restricciones Técnicas Obligatorias
-	- Flujo de Entrega y Puertas de Calidad
-	- Continuidad sobre Proyecto Existente
+	- Reglas de Evolución del Dominio (Iteración 003)
 - Removed sections:
 	- Ninguna
 - Templates requiring updates:
-	- ✅ .specify/templates/plan-template.md
-	- ✅ .specify/templates/spec-template.md
-	- ✅ .specify/templates/tasks-template.md
-	- ⚠ pending: .specify/templates/commands/*.md (directorio no existe en este repositorio)
-	- ✅ .github/prompts/*.md (verificado, sin referencias desactualizadas)
+	- ⚠ pendiente de verificación en siguiente paso de speckit.constitution
 - Deferred TODOs:
-	- Ninguno
+	- Sincronizar plantillas tras confirmar alcance final de Iteración 003
 -->
 
 # DSW02-Practica01 Constitution
@@ -35,7 +26,7 @@ Spring Security, Spring Data JPA cuando aplique) y MUST evitar mezclas de framew
 que dupliquen responsabilidades de runtime.
 Rationale: un runtime único reduce riesgo operativo, deuda técnica y fricción de mantenimiento.
 
-### II. Seguridad Evolutiva por Iteraciones
+### II. Seguridad Evolutiva y Compatibilidad por Iteraciones
 Todo endpoint no público MUST permanecer protegido por Spring Security y la estrategia
 de autenticación MUST evolucionar por iteración funcional.
 
@@ -43,6 +34,9 @@ de autenticación MUST evolucionar por iteración funcional.
 	como mecanismo global académico para operación y validación inicial.
 - En iteración 002, el sistema MUST incorporar autenticación de empleados basada en
 	`correo` y `password` persistidos en PostgreSQL.
+- En iteración 003, los nuevos endpoints de departamentos MUST conservar compatibilidad
+	con el esquema de autenticación vigente (JWT para negocio de empleados y reglas
+	administrativas existentes), salvo enmienda explícita de seguridad.
 - La autenticación de empleados MUST validar credenciales contra datos persistidos y
 	MUST almacenar contraseñas con hash seguro (nunca texto plano).
 - La opción JWT MAY adoptarse en iteración 002 cuando mejore separación entre login de
@@ -56,6 +50,9 @@ Toda persistencia relacional MUST usar PostgreSQL. Para desarrollo e integració
 la base MUST ejecutarse en Docker (Docker Compose u orquestación equivalente) y la
 aplicación MUST poder levantar contra esa instancia sin cambios de código. La
 configuración de conexión MUST ser parametrizable por entorno.
+Toda nueva entidad de dominio (por ejemplo Departamentos en iteración 003) MUST
+introducirse mediante migraciones incrementales y relaciones explícitas, sin
+recrear tablas existentes ni romper compatibilidad de datos previos.
 Rationale: la paridad de entorno reduce incidencias entre desarrollo, pruebas y despliegue.
 
 ### IV. Contrato API Versionado en Swagger
@@ -72,6 +69,9 @@ proporcionales al riesgo, y MUST registrar decisiones técnicas relevantes en lo
 de especificación/plan/tareas. Toda entrega MUST validar arranque de aplicación,
 conectividad a PostgreSQL en Docker y disponibilidad del endpoint de Swagger. Todo
 endpoint de listado GET MUST soportar paginación explícita y documentada.
+Cuando se agreguen relaciones entre agregados (ej. Empleado-Departamento), las
+pruebas MUST cubrir integridad referencial, comportamiento CRUD y regresión de
+casos existentes de iteraciones previas.
 Rationale: sin evidencia verificable y sin control de volumen en listados no existe criterio objetivo de completitud.
 
 ## Alcance por Iteracion
@@ -80,8 +80,10 @@ Rationale: sin evidencia verificable y sin control de volumen en listados no exi
 	paginacion, PostgreSQL en Docker, Swagger/OpenAPI y Basic Auth global.
 - Iteracion 002 (`002-crud-empleados-spring-boot`): extension de seguridad para login
 	de empleados por `correo` + `password` con persistencia en base de datos (y JWT opcional).
-- Iteracion 003 (`003-*`): funcionalidades de departamentos. MUST permanecer fuera de
-	alcance durante la iteracion 002.
+- Iteracion 003 (`003-*`): CRUD de departamentos y relación con empleados sobre el
+	proyecto existente. MUST ejecutarse de forma incremental, sin regenerar el proyecto
+	y sin alterar la base funcional de iteración 002 más allá de lo estrictamente
+	necesario para modelar la relación.
 
 ## Restricciones Técnicas Obligatorias
 
@@ -91,6 +93,12 @@ Rationale: sin evidencia verificable y sin control de volumen en listados no exi
 - El acceso básico MUST operar con usuario `admin` y contraseña `admin123`.
 - La iteración 002 MUST implementar autenticación de empleados por `correo` y `password`
 	validados contra datos persistidos en PostgreSQL.
+- La iteración 003 MUST crear entidad y tabla de departamentos en PostgreSQL mediante
+	migraciones incrementales.
+- La iteración 003 MUST relacionar empleados con departamentos preservando integridad
+	referencial y compatibilidad de datos existentes.
+- La iteración 003 MUST exponer CRUD de departamentos con documentación OpenAPI y
+	rutas versionadas.
 - Las contraseñas de empleados MUST almacenarse con hash seguro y no en texto plano.
 - Si se adopta JWT, el contrato OpenAPI MUST documentar endpoint de autenticación,
 	formato del token, expiración y respuestas de error.
@@ -100,11 +108,23 @@ Rationale: sin evidencia verificable y sin control de volumen en listados no exi
 - Los endpoints HTTP MUST incluir versión explícita en la ruta (`/v1` o equivalente).
 - Los endpoints GET de listado MUST exponer parámetros de paginación.
 
+## Reglas de Evolución del Dominio (Iteración 003)
+
+- La incorporación de Departamentos MUST tratarse como expansión del dominio, no como
+	refactor destructivo del modelo actual.
+- Toda relación entre Empleado y Departamento MUST declararse explícitamente en modelo,
+	esquema y contrato API.
+- Las reglas de negocio preexistentes de Empleados MUST mantenerse operativas tras la
+	integración con Departamentos, salvo cambios aprobados en especificación de iteración.
+- Ninguna migración de Iteración 003 MUST modificar retrospectivamente migraciones ya
+	aplicadas de iteraciones 001/002.
+
 ## Flujo de Entrega y Puertas de Calidad
 
 1. Toda especificación MUST declarar requisitos de seguridad (Basic Auth), persistencia
 	(PostgreSQL) y contrato API (Swagger + versionado explícito).
    En iteración 002 MUST incluir login de empleados por correo/password persistido.
+	En iteración 003 MUST incluir relación Empleado-Departamento y CRUD de departamentos.
 2. Todo plan MUST incluir un Constitution Check explícito para stack, seguridad,
 	base de datos containerizada y documentación API.
 3. Toda lista de tareas MUST contemplar configuración Docker/PostgreSQL, seguridad,
@@ -123,6 +143,8 @@ Rationale: sin evidencia verificable y sin control de volumen en listados no exi
 - Toda nueva iteración MUST partir de artefactos actuales y registrar deltas, no reinicios.
 - La iteración 002 MUST concentrarse en autenticación de empleados y MUST NOT incluir
 	inicio de CRUD de departamentos.
+- La iteración 003 MUST iniciarse con actualización constitucional y luego continuar con
+	`/speckit.specify` sobre el alcance incremental de Departamentos.
 
 ## Governance
 
@@ -140,4 +162,4 @@ Proceso de enmienda y cumplimiento:
 - Si un directorio obligatorio de plantillas no existe, MUST registrarse en el Sync Impact Report.
 - La revisión de cumplimiento MUST ejecutarse en planificación y antes de cerrar tareas.
 
-**Version**: 2.1.0 | **Ratified**: 2026-02-26 | **Last Amended**: 2026-03-12
+**Version**: 2.2.0 | **Ratified**: 2026-02-26 | **Last Amended**: 2026-03-19

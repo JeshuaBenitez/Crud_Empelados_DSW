@@ -35,7 +35,7 @@ public class SecurityConfig {
         @Order(1)
         public SecurityFilterChain empleadosJwtChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
-            .securityMatcher("/api/v1/empleados/**")
+            .securityMatcher("/api/v1/empleados/**", "/api/v1/departamentos/**")
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth.anyRequest().hasRole("EMPLEADO"))

@@ -1,5 +1,8 @@
+/home/jbenitez/DW_Gabo/DSW02-Practica01/src/test/java/com/dwgabo/dsw02practica01/controller/DepartamentoControllerIntegrationTest.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/test/java/com/dwgabo/dsw02practica01/controller/EmpleadoControllerUs1IntegrationTest.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/test/java/com/dwgabo/dsw02practica01/controller/EmpleadoPaginationValidationIntegrationTest.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/test/java/com/dwgabo/dsw02practica01/security/AuthControllerLoginIntegrationTest.java
+/home/jbenitez/DW_Gabo/DSW02-Practica01/src/test/java/com/dwgabo/dsw02practica01/security/DepartamentoJwtSecurityIntegrationTest.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/test/java/com/dwgabo/dsw02practica01/service/AuthServiceUs1Test.java
+/home/jbenitez/DW_Gabo/DSW02-Practica01/src/test/java/com/dwgabo/dsw02practica01/service/DepartamentoServiceUs1Test.java
 /home/jbenitez/DW_Gabo/DSW02-Practica01/src/test/java/com/dwgabo/dsw02practica01/service/EmpleadoServiceUs1Test.java
