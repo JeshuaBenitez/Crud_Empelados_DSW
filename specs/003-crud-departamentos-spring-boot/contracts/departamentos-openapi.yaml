@@ -1,0 +1,132 @@
+openapi: 3.0.3
+info:
+  title: API Departamentos
+  version: 3.0.0
+  description: Contrato de CRUD de departamentos y relacion plana con empleados.
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/v1/departamentos:
+    get:
+      summary: Listar departamentos
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: size
+          schema:
+            type: integer
+            default: 10
+            maximum: 100
+      responses:
+        '200':
+          description: Listado paginado
+        '400':
+          description: Parametros invalidos
+        '401':
+          description: No autenticado
+    post:
+      summary: Crear departamento
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre]
+              properties:
+                nombre:
+                  type: string
+                  maxLength: 100
+      responses:
+        '201':
+          description: Creado
+        '400':
+          description: Payload invalido
+        '401':
+          description: No autenticado
+        '409':
+          description: Nombre duplicado
+  /api/v1/departamentos/{clave}:
+    get:
+      summary: Obtener departamento por clave
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: clave
+          required: true
+          schema:
+            type: string
+            example: DEP-1
+      responses:
+        '200':
+          description: Encontrado
+        '401':
+          description: No autenticado
+        '404':
+          description: No encontrado
+    put:
+      summary: Actualizar departamento
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: clave
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre]
+              properties:
+                nombre:
+                  type: string
+                  maxLength: 100
+      responses:
+        '200':
+          description: Actualizado
+        '400':
+          description: Payload invalido
+        '401':
+          description: No autenticado
+        '404':
+          description: No encontrado
+        '409':
+          description: Nombre duplicado
+    delete:
+      summary: Eliminar departamento
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: clave
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminado
+        '401':
+          description: No autenticado
+        '404':
+          description: No encontrado
+        '409':
+          description: Tiene empleados asociados
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

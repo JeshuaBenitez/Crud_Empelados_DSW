@@ -1,0 +1,16 @@
+import { defineConfig } from 'cypress';
+
+export default defineConfig({
+  allowCypressEnv: false,
+  reporter: 'mocha-junit-reporter',
+  reporterOptions: {
+    mochaFile: 'cypress/reports/junit/test-results-[hash].xml',
+    toConsole: false
+  },
+  e2e: {
+    baseUrl: 'http://localhost:4200',
+    supportFile: 'cypress/support/e2e.ts',
+    specPattern: 'cypress/e2e/**/*.cy.ts',
+    video: false
+  }
+});
