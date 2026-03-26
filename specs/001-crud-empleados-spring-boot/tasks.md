@@ -21,7 +21,7 @@
 
 - [ ] T001 Verificar dependencias necesarias de Spring Boot 3, Security, JPA, Flyway, PostgreSQL y OpenAPI en `DSW02-Practica01/pom.xml`
 - [ ] T002 [P] Configurar propiedades de datasource/flyway y credenciales Basic fijas (`admin/admin123`) en `DSW02-Practica01/src/main/resources/application.properties`
-- [ ] T003 [P] Validar compatibilidad dockerizada de API + PostgreSQL en `DSW02-Practica01/docker-compose.yml`
+- [ ] T003 [P] Validar compatibilidad dockerizada de API + PostgreSQL en `docker-compose.yml`
 - [ ] T004 [P] Actualizar guía de arranque con variables y credenciales académicas en `specs/001-crud-empleados-spring-boot/quickstart.md`
 
 ---
@@ -105,7 +105,7 @@
 ### Implementation for User Story 3
 
 - [ ] T026 [US3] Actualizar contrato OpenAPI con rutas `/api/v1/empleados` y parámetros `page/size` en `specs/001-crud-empleados-spring-boot/contracts/empleados-openapi.yaml`
-- [ ] T027 [US3] Validar y ajustar configuración Docker de dos contenedores (api + postgres) y red interna en `DSW02-Practica01/docker-compose.yml`
+- [ ] T027 [US3] Validar y ajustar configuración Docker de dos contenedores (api + postgres) y red interna en `docker-compose.yml`
 - [ ] T028 [US3] Actualizar quickstart con flujo de prueba en API v1 y autenticación fija en `specs/001-crud-empleados-spring-boot/quickstart.md`
 
 **Checkpoint**: Seguridad, documentación y operación dockerizada verificadas

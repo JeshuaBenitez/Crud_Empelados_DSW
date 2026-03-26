@@ -21,7 +21,7 @@
 
 - [ ] T001 Agregar y fijar dependencia JWT compatible con Spring Boot 3/Java 17 en `DSW02-Practica01/pom.xml`
 - [ ] T002 [P] Agregar propiedades de JWT (secret, expiracion) y mantener compatibilidad con Basic admin en `DSW02-Practica01/src/main/resources/application.properties`
-- [ ] T003 [P] Verificar variables de entorno requeridas para JWT y seguridad en `DSW02-Practica01/docker-compose.yml`
+- [ ] T003 [P] Verificar variables de entorno requeridas para JWT y seguridad en `docker-compose.yml`
 - [ ] T004 [P] Crear paquete de seguridad para componentes JWT en `DSW02-Practica01/src/main/java/com/dwgabo/dsw02practica01/security/`
 
 ---
