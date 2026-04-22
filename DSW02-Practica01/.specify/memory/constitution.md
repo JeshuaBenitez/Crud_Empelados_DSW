@@ -1,19 +1,20 @@
 <!--
 Sync Impact Report
-- Version change: 2.2.0 -> 2.3.0
+- Version change: 2.3.0 -> 2.4.0
 - Modified principles:
 	- I. Runtime Base Inmutable -> I. Runtime Base Inmutable y Bimodal
 	- II. Seguridad Evolutiva y Compatibilidad por Iteraciones (extensión de flujo JWT para frontend)
 	- IV. Contrato API Versionado en Swagger (consumo contractual desde frontend)
-	- V. Calidad Verificable, Paginación y Trazabilidad (cobertura E2E frontend con Cypress)
+	- V. Calidad Verificable, Paginación y Trazabilidad (cobertura E2E frontend con Cypress + CI en GitHub Actions)
 - Added sections:
 	- Reglas de Evolución Frontend (Iteración 004)
+	- Reglas de Integración Continua (Iteración 005)
 - Removed sections:
 	- Ninguna
 - Templates requiring updates:
-	- ⚠ pendiente de verificación para plantillas que referencian stack único backend
+	- ⚠ pendiente de verificación para plantillas que no contemplan CI en `.github/workflows/ci-01.yml`
 - Deferred TODOs:
-	- Sincronizar plantillas tras confirmar alcance final de Iteración 004
+	- Sincronizar plantillas tras confirmar alcance final de Iteración 005
 -->
 
 # DSW02-Practica01 Constitution
@@ -83,6 +84,11 @@ casos existentes de iteraciones previas.
 En iteración 004, la capa frontend MUST incorporar pruebas automatizadas con Cypress
 para flujos críticos (login, navegación principal y operaciones CRUD clave), en
 proporción al riesgo de regresión.
+En iteración 005, el repositorio MUST incorporar automatización de integración continua
+con GitHub Actions en `.github/workflows/ci-01.yml`, con jobs separados para backend
+y frontend. El workflow MUST ejecutarse por `push` a `master` y `develop`, por
+`pull_request` hacia `master` y `develop`, y por `workflow_dispatch`. El objetivo
+inicial de CI MUST limitarse a validación automática (build/pruebas), sin despliegue.
 Rationale: sin evidencia verificable y sin control de volumen en listados no existe criterio objetivo de completitud.
 
 ## Alcance por Iteracion
@@ -100,6 +106,9 @@ Rationale: sin evidencia verificable y sin control de volumen en listados no exi
 	de API backend existente, flujo de login de empleados y pantallas para login,
 	CRUD de empleados y CRUD de departamentos. La evolución MUST ser incremental,
 	sin regenerar backend ni reestructurar innecesariamente el repositorio.
+- Iteracion 005 (`005-ci-github-actions`): incorporación incremental de integración
+	continua en el mismo repositorio mediante GitHub Actions, con validaciones separadas
+	de backend y frontend, sin modificar arquitectura funcional ni introducir despliegue.
 
 ## Restricciones Técnicas Obligatorias
 
@@ -113,6 +122,14 @@ Rationale: sin evidencia verificable y sin control de volumen en listados no exi
 - El frontend MUST incluir pantallas de login, CRUD de empleados y CRUD de departamentos.
 - El frontend MUST usar Tailwind CSS como base de interfaz.
 - La iteración frontend MUST contemplar pruebas E2E con Cypress.
+- La iteración 005 MUST definir workflow en `.github/workflows/ci-01.yml`.
+- El workflow CI MUST separar validaciones en jobs de backend y frontend.
+- El job de backend MUST usar Java 17 y Maven Wrapper del proyecto.
+- El job de frontend MUST usar Node 20 y `npm`.
+- El workflow CI MUST activarse por `push` a `master` y `develop`.
+- El workflow CI MUST activarse por `pull_request` hacia `master` y `develop`.
+- El workflow CI MUST exponer ejecución manual por `workflow_dispatch`.
+- La iteración 005 MUST enfocarse en validación (build/pruebas) y MUST NOT incluir despliegue.
 - La autenticación básica MUST aplicarse al menos a rutas de negocio y administración.
 - El acceso básico MUST operar con usuario `admin` y contraseña `admin123`.
 - La iteración 002 MUST implementar autenticación de empleados por `correo` y `password`
@@ -158,21 +175,39 @@ Rationale: sin evidencia verificable y sin control de volumen en listados no exi
 - Tailwind CSS MUST aplicarse como sistema base de estilos, preservando consistencia
 	visual y mantenibilidad.
 
+## Reglas de Integración Continua (Iteración 005)
+
+- La integración continua MUST tratarse como evolución del mismo proyecto, no como
+	subproyecto externo ni pipeline independiente fuera del repositorio.
+- El workflow CI MUST ubicarse en `.github/workflows/ci-01.yml`.
+- Los jobs de validación MUST reflejar la estructura actual: backend en
+	`DSW02-Practica01/` y frontend en `frontend-angular/`.
+- El job backend MUST ejecutar validaciones con Maven Wrapper y Java 17.
+- El job frontend MUST ejecutar validaciones con Node 20 y `npm`.
+- Los gatillos (`push`, `pull_request`, `workflow_dispatch`) MUST mantenerse
+	consistentes con la política de ramas `master` y `develop`.
+- La iteración 005 MUST NOT introducir despliegue automático, publicación de artefactos
+	o cambios de arquitectura funcional.
+
 ## Flujo de Entrega y Puertas de Calidad
 
 1. Toda especificación MUST declarar requisitos de seguridad (Basic Auth), persistencia
 	(PostgreSQL) y contrato API (Swagger + versionado explícito).
    En iteración 002 MUST incluir login de empleados por correo/password persistido.
 	En iteración 003 MUST incluir relación Empleado-Departamento y CRUD de departamentos.
-   En iteración 004 MUST incluir alcance de frontend Angular 22, consumo API existente,
+	En iteración 004 MUST incluir alcance de frontend Angular 22, consumo API existente,
 	flujo JWT de empleados, uso de Tailwind y estrategia de pruebas Cypress.
+	En iteración 005 MUST incluir alcance de CI con GitHub Actions, ubicación de workflow,
+	jobs separados backend/frontend, gatillos obligatorios y exclusión explícita de despliegue.
 2. Todo plan MUST incluir un Constitution Check explícito para stack, seguridad,
 	base de datos containerizada y documentación API.
 3. Toda lista de tareas MUST contemplar configuración Docker/PostgreSQL, seguridad,
 	documentación Swagger, versionado de endpoints, paginación y pruebas.
    En iteración 002 MUST contemplar pruebas de autenticación exitosa/fallida de empleados.
-   En iteración 004 MUST contemplar scaffolding frontend, integración con backend,
+	En iteración 004 MUST contemplar scaffolding frontend, integración con backend,
 	flujos CRUD en UI y pruebas E2E críticas.
+	En iteración 005 MUST contemplar definición de CI, validación separada backend/frontend
+	y evidencia de ejecución automática en PR/push y ejecución manual.
 4. Ningún cambio pasa a implementación final si falla compilación, pruebas críticas o
 	verificación manual mínima de endpoints documentados.
 
@@ -191,6 +226,9 @@ Rationale: sin evidencia verificable y sin control de volumen en listados no exi
 - La iteración 004 MUST iniciar con esta enmienda constitucional y luego continuar con
 	`/speckit.specify` sobre el alcance incremental del frontend, sin reabrir decisiones
 	resueltas de iteraciones 001-003 salvo conflicto explícito.
+- La iteración 005 MUST iniciar con esta enmienda constitucional y luego continuar con
+	`/speckit.specify` sobre CI en GitHub Actions, sin modificar arquitectura funcional
+	del backend/frontend ni separar el repositorio.
 
 ## Governance
 
@@ -208,4 +246,4 @@ Proceso de enmienda y cumplimiento:
 - Si un directorio obligatorio de plantillas no existe, MUST registrarse en el Sync Impact Report.
 - La revisión de cumplimiento MUST ejecutarse en planificación y antes de cerrar tareas.
 
-**Version**: 2.3.0 | **Ratified**: 2026-02-26 | **Last Amended**: 2026-03-19
+**Version**: 2.4.0 | **Ratified**: 2026-02-26 | **Last Amended**: 2026-04-20
