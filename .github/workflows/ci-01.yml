@@ -48,3 +48,39 @@ jobs:
       - name: Run frontend tests
         working-directory: frontend-angular
         run: npm run test -- --watch=false --no-progress
+
+      - name: Start stack for Cypress E2E
+        run: docker compose up -d postgres api frontend
+
+      - name: Wait for frontend to be ready
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://localhost:4200 > /dev/null; then
+              echo "Frontend disponible en localhost:4200"
+              exit 0
+            fi
+            echo "Esperando frontend... intento $i/60"
+            sleep 5
+          done
+          echo "Frontend no estuvo disponible a tiempo"
+          docker compose logs frontend api postgres
+          exit 1
+
+      - name: Run Cypress E2E
+        working-directory: frontend-angular
+        run: npm run cypress:run:junit
+
+      - name: Upload Cypress artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-artifacts
+          path: |
+            frontend-angular/cypress/reports
+            frontend-angular/cypress/screenshots
+            frontend-angular/cypress/videos
+          if-no-files-found: ignore
+
+      - name: Stop stack
+        if: always()
+        run: docker compose down -v

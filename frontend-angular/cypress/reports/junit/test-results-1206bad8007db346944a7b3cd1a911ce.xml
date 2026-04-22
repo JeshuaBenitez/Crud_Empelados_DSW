@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="1.301" tests="1" failures="0">
+  <testsuite name="Root Suite" timestamp="2026-04-22T20:21:33" tests="0" file="cypress/e2e/departamentos/departamentos.cy.ts" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Departamentos module" timestamp="2026-04-22T20:21:33" tests="1" time="1.301" failures="0">
+    <testcase name="Departamentos module loads departamentos page" time="1.242" classname="loads departamentos page">
+    </testcase>
+  </testsuite>
+</testsuites>
