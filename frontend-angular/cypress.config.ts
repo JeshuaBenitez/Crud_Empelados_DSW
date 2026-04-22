@@ -1,6 +1,7 @@
 import { defineConfig } from 'cypress';
 
 export default defineConfig({
+  projectId: 'mduf25',
   allowCypressEnv: false,
   reporter: 'mocha-junit-reporter',
   reporterOptions: {
