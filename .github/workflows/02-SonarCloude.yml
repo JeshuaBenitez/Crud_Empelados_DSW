@@ -1,4 +1,4 @@
-name: 02-SonarCloude
+name: 02-SonarCloud
 
 on:
   pull_request:
@@ -6,8 +6,6 @@ on:
       - main
     types:
       - opened
-      - synchronize
-      - reopened
   workflow_dispatch:
 
 jobs:
@@ -43,7 +41,9 @@ jobs:
       - name: Build and Sonar analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
         run: >-
           mvn -B -f DSW02-Practica01/pom.xml verify
           org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
           -Dsonar.projectKey=JeshuaBenitez_Crud_Empelados_DSW
+          -Dsonar.organization=${SONAR_ORGANIZATION}
