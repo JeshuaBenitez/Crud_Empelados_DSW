@@ -1,5 +1,5 @@
 name: 02-SonarCloud
-# workflow para lanzar SonarCloude
+
 on:
   pull_request:
     branches:
