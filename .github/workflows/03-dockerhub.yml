@@ -77,3 +77,4 @@ jobs:
         run: |
           echo "Backend image pushed: ${{ secrets.DOCKER_USERNAME }}/crud-empleados-api"
           echo "Frontend image pushed: ${{ secrets.DOCKER_USERNAME }}/crud-empleados-frontend"
+
