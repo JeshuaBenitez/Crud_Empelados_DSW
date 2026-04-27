@@ -1,5 +1,4 @@
 name: CI 01
-# Workflow for CI testing backend and frontend
 
 on:
   push:
