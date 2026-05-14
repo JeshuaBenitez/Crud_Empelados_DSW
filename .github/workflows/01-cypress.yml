@@ -29,6 +29,10 @@ jobs:
         working-directory: frontend-angular
         run: npm ci
 
+      - name: Build frontend for Docker
+        working-directory: frontend-angular
+        run: npm run build
+
       - name: Start stack for Cypress E2E
         run: docker compose up -d postgres api frontend
 
@@ -82,4 +86,4 @@ jobs:
             } else {
               console.log('PR already exists; skipping creation');
             }
-#checkpoint: total ejecuciones:2  | ejecuciones fallidas: 2 | ejecuciones exitosas: 0
+#checkpoint: total ejecuciones:3  | ejecuciones fallidas: 3 | ejecuciones exitosas: 0
