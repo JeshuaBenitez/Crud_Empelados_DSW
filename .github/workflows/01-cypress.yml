@@ -82,3 +82,4 @@ jobs:
             } else {
               console.log('PR already exists; skipping creation');
             }
+#checkpoint: total ejecuciones:2  | ejecuciones fallidas: 2 | ejecuciones exitosas: 0
