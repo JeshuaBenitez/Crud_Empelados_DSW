@@ -24,3 +24,4 @@ jobs:
       - name: Run backend tests
         run: mvn -B -f DSW02-Practica01/pom.xml test
   # Frontend/Cypress moved to a dedicated workflow: 01-cypress.yml
+  # encargado de lanzarse para emepzar el encadenamiento
