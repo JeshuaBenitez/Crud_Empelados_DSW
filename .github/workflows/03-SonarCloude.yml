@@ -1,5 +1,5 @@
-name: 02-SonarCloud
-# workflow encargado de lanzar el SonarCloud
+name: 03-SonarCloud
+
 on:
   pull_request:
     branches:
@@ -13,6 +13,7 @@ jobs:
   sonarcloud:
     name: Build and analyze
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
