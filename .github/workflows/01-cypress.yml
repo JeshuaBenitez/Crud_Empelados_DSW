@@ -29,26 +29,42 @@ jobs:
         working-directory: frontend-angular
         run: npm ci
 
-      - name: Start frontend app
-        working-directory: frontend-angular
-        run: npm start > /tmp/ng-serve.log 2>&1 &
+      - name: Start stack for Cypress E2E
+        run: docker compose up -d postgres api frontend
 
       - name: Wait for frontend to be ready
         run: |
           for i in {1..60}; do
-            if curl -sSf http://127.0.0.1:4200 >/dev/null; then
+            if curl -sSf http://localhost:4200 >/dev/null; then
               echo "Frontend is ready"
               exit 0
             fi
             sleep 2
           done
           echo "Frontend did not start in time"
-          cat /tmp/ng-serve.log
+          docker compose logs frontend api postgres
+          exit 1
+
+      - name: Wait for backend to be ready
+        run: |
+          for i in {1..60}; do
+            if curl -sSf http://localhost:8081/actuator/health >/dev/null; then
+              echo "Backend is ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Backend did not start in time"
+          docker compose logs frontend api postgres
           exit 1
 
       - name: Run Cypress
         working-directory: frontend-angular
         run: npm run cypress:run:junit
+
+      - name: Stop stack
+        if: always()
+        run: docker compose down -v
 
       - name: Create PR deploy->main if not exists
         uses: actions/github-script@v6
