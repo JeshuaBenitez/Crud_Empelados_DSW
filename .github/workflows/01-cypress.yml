@@ -52,8 +52,14 @@ jobs:
       - name: Wait for backend to be ready
         run: |
           for i in {1..60}; do
+<<<<<<< Updated upstream
             if curl -sSf http://localhost:8081/actuator/health >/dev/null; then
               echo "Backend is ready"
+=======
+            status=$(curl -sS -o /dev/null -w "%{http_code}" --connect-timeout 2 --max-time 5 http://localhost:8081/ || true)
+            if [[ "$status" != "000" ]]; then
+              echo "Backend is ready (HTTP $status)"
+>>>>>>> Stashed changes
               exit 0
             fi
             sleep 2
