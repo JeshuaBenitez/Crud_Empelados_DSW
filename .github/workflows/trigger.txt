@@ -1,3 +1,0 @@
-Trigger file to force CI run
-Timestamp: 2026-05-14T00:00:00Z
-trigger lun 18 may 2026 14:43:22 CST
