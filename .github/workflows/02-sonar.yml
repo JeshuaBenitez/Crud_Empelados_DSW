@@ -57,6 +57,7 @@ jobs:
           args: >
             -Dsonar.projectKey=JeshuaBenitez_Crud_Empelados_DSW
             -Dsonar.organization=jeshuabenitez
+            -Dsonar.java.binaries=DSW02-Practica01/target/classes
 
       - name: Validar compuerta de calidad (Quality Gate)
         uses: SonarSource/sonarqube-quality-gate-action@master
