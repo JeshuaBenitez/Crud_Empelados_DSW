@@ -35,7 +35,7 @@ jobs:
           start: npx ng serve --port 8088
           wait-on: 'http://localhost:8088'
           wait-on-timeout: 120000
-          command: npx cypress run --spec cypress/e2e/auth/login-crud-empleados.localhost8088.cy.ts --config baseUrl=http://localhost:8088
+          command: npx cypress run --spec cypress/e2e/auth/login.cy.ts --config baseUrl=http://localhost:8088
 
       - name: Upload Cypress screenshots on failure
         if: failure()
