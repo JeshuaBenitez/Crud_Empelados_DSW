@@ -28,6 +28,7 @@
     "@angular/build": "^21.2.3",
     "@angular/cli": "^21.2.3",
     "@angular/compiler-cli": "^21.2.0",
+    "@vitest/coverage-v8": "^4.0.8",
     "autoprefixer": "^10.4.27",
     "cypress": "^15.12.0",
     "mocha-junit-reporter": "^2.2.1",
