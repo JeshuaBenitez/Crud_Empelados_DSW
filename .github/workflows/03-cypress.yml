@@ -41,7 +41,7 @@ jobs:
 
       - name: Levantar API Backend en segundo plano
         working-directory: .
-        run: mvn -f DSW02-Practica01/pom.xml spring-boot:run -Dspring-boot.run.arguments="--server.port=8081" &
+        run: mvn -f DSW02-Practica01/pom.xml spring-boot:run -Dspring-boot.run.arguments="--server.port=8081 --app.security.cors.allowed-origin=http://localhost:8088" &
 
       - name: Esperar a que la API esté lista
         working-directory: .
