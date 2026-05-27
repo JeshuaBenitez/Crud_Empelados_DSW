@@ -26,6 +26,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class EmpleadoServiceUs1Test {
 
+    private static final String TEST_EMAIL = "empleado.demo@empresa.com";
+    private static final String EMP_PREFIX = "EMP";
+    private static final String DEP_PREFIX = "DEP";
+
     @Mock
     private EmpleadoRepository empleadoRepository;
 
@@ -33,7 +37,7 @@ class EmpleadoServiceUs1Test {
     private EmpleadoService empleadoService;
 
     @Test
-    void crear_generaclaveEmpConsecutiva() {
+    void crearGeneraClaveEmpConsecutiva() {
         CreateEmpleadoRequest request = new CreateEmpleadoRequest();
         request.setNombre("Ana Pérez");
         request.setDireccion("Av. Central 123");
@@ -50,27 +54,27 @@ class EmpleadoServiceUs1Test {
         ArgumentCaptor<Empleado> captor = ArgumentCaptor.forClass(Empleado.class);
         verify(empleadoRepository).save(captor.capture());
         Empleado guardado = captor.getValue();
-        assertEquals("EMP", guardado.getId().getPrefijo());
+        assertEquals(EMP_PREFIX, guardado.getId().getPrefijo());
         assertEquals(1L, guardado.getId().getNumero());
     }
 
     @Test
-    void listar_devuelvePaginacionConMetadata() {
+    void listarDevuelvePaginacionConMetadata() {
         Empleado empleado = new Empleado();
-        empleado.setId(new EmpleadoId("EMP", 7L));
-        empleado.setCorreo("empleado.demo@empresa.com");
+        empleado.setId(new EmpleadoId(EMP_PREFIX, 7L));
+        empleado.setCorreo(TEST_EMAIL);
         empleado.setNombre("Luis");
         empleado.setDireccion("Calle 7");
         empleado.setTelefono("555777");
         Departamento departamento = new Departamento();
-        departamento.setId(new DepartamentoId("DEP", 2L));
+        departamento.setId(new DepartamentoId(DEP_PREFIX, 2L));
         departamento.setNombre("Operaciones");
         empleado.setDepartamento(departamento);
 
-        when(empleadoRepository.findByCorreoIgnoreCase("empleado.demo@empresa.com"))
+        when(empleadoRepository.findByCorreoIgnoreCase(TEST_EMAIL))
             .thenReturn(Optional.of(empleado));
 
-        EmpleadoPageResponse response = empleadoService.listarPropio("empleado.demo@empresa.com", 0, 10);
+        EmpleadoPageResponse response = empleadoService.listarPropio(TEST_EMAIL, 0, 10);
 
         assertEquals(0, response.getPage());
         assertEquals(10, response.getSize());
@@ -82,13 +86,13 @@ class EmpleadoServiceUs1Test {
     }
 
     @Test
-    void listar_rechazaPaginacionInvalida() {
+    void listarRechazaPaginacionInvalida() {
         IllegalArgumentException ex1 = assertThrows(IllegalArgumentException.class,
-            () -> empleadoService.listarPropio("empleado.demo@empresa.com", -1, 10));
+            () -> empleadoService.listarPropio(TEST_EMAIL, -1, 10));
         assertEquals("El parámetro page debe ser mayor o igual a 0", ex1.getMessage());
 
         IllegalArgumentException ex2 = assertThrows(IllegalArgumentException.class,
-            () -> empleadoService.listarPropio("empleado.demo@empresa.com", 0, 101));
+            () -> empleadoService.listarPropio(TEST_EMAIL, 0, 101));
         assertEquals("El parámetro size debe estar entre 1 y 100", ex2.getMessage());
     }
 }

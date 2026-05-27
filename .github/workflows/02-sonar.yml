@@ -6,13 +6,15 @@ on:
       - chain-sonar
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   sonarcloud:
     name: SonarCloud Scan
     runs-on: ubuntu-latest
     if: ${{ github.event.client_payload.branch == 'deploy' }}
+    permissions:
+      contents: write
 
     steps:
       - name: Descargar el codigo (Checkout)
@@ -37,7 +39,7 @@ jobs:
 
       - name: Instalar dependencias frontend
         working-directory: frontend-angular
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Ejecutar tests frontend con cobertura
         working-directory: frontend-angular
@@ -60,7 +62,7 @@ jobs:
             -Dsonar.java.binaries=DSW02-Practica01/target/classes
 
       - name: Validar compuerta de calidad (Quality Gate)
-        uses: SonarSource/sonarqube-quality-gate-action@master
+        uses: SonarSource/sonarqube-quality-gate-action@v1.1.0
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

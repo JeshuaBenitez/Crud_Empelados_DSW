@@ -22,7 +22,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "app.security.basic.username=admin",
         "app.security.basic.password=admin123"
 })
+@SuppressWarnings("java:S2068")
 class EmpleadoControllerUs1IntegrationTest {
+
+    private static final String TEST_EMAIL = "empleado.demo@empresa.com";
+    private static final String EMP_CLAVE = "EMP-1";
 
     @Autowired
     private MockMvc mockMvc;
@@ -36,15 +40,15 @@ class EmpleadoControllerUs1IntegrationTest {
     @Test
     void obtenerPropioPorClaveVersionada() throws Exception {
         EmpleadoResponse response = new EmpleadoResponse();
-        response.setClave("EMP-1");
+        response.setClave(EMP_CLAVE);
         response.setNombre("Ana Pérez");
         response.setDireccion("Av. Central 123");
         response.setTelefono("555123456");
 
-        when(empleadoService.obtenerPorClave(eq("EMP-1"), eq("empleado.demo@empresa.com"))).thenReturn(response);
+        when(empleadoService.obtenerPorClave(eq(EMP_CLAVE), eq(TEST_EMAIL))).thenReturn(response);
 
-        mockMvc.perform(get("/api/v1/empleados/EMP-1")
-                        .with(SecurityMockMvcRequestPostProcessors.user("empleado.demo@empresa.com").roles("EMPLEADO")))
+        mockMvc.perform(get("/api/v1/empleados/" + EMP_CLAVE)
+                        .with(SecurityMockMvcRequestPostProcessors.user(TEST_EMAIL).roles("EMPLEADO")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nombre").value("Ana Pérez"));
     }

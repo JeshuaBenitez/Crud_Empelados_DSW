@@ -18,73 +18,86 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final String KEY_TIMESTAMP = "timestamp";
+    private static final String KEY_STATUS = "status";
+    private static final String KEY_ERROR = "error";
+    private static final String KEY_MESSAGE = "message";
+    private static final String KEY_DETAILS = "details";
+
+    private static final String MSG_BAD_REQUEST = "Bad Request";
+    private static final String MSG_NOT_FOUND = "Not Found";
+    private static final String MSG_CONFLICT = "Conflict";
+    private static final String MSG_UNAUTHORIZED = "Unauthorized";
+    private static final String MSG_FORBIDDEN = "Forbidden";
+    private static final String MSG_INTERNAL_SERVER_ERROR = "Internal Server Error";
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Map<String, Object>> manejarBadRequest(BadRequestException ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", "Bad Request");
-        response.put("message", ex.getMessage());
+        response.put(KEY_TIMESTAMP, LocalDateTime.now());
+        response.put(KEY_STATUS, HttpStatus.BAD_REQUEST.value());
+        response.put(KEY_ERROR, MSG_BAD_REQUEST);
+        response.put(KEY_MESSAGE, ex.getMessage());
         return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> manejarIllegalArgument(IllegalArgumentException ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", "Bad Request");
-        response.put("message", ex.getMessage());
+        response.put(KEY_TIMESTAMP, LocalDateTime.now());
+        response.put(KEY_STATUS, HttpStatus.BAD_REQUEST.value());
+        response.put(KEY_ERROR, MSG_BAD_REQUEST);
+        response.put(KEY_MESSAGE, ex.getMessage());
         return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Map<String, Object>> manejarTipoInvalido(MethodArgumentTypeMismatchException ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", "Bad Request");
-        response.put("message", "Parámetro inválido: " + ex.getName());
+        response.put(KEY_TIMESTAMP, LocalDateTime.now());
+        response.put(KEY_STATUS, HttpStatus.BAD_REQUEST.value());
+        response.put(KEY_ERROR, MSG_BAD_REQUEST);
+        response.put(KEY_MESSAGE, "Parámetro inválido: " + ex.getName());
         return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> manejarNoEncontrado(ResourceNotFoundException ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.NOT_FOUND.value());
-        response.put("error", "Not Found");
-        response.put("message", ex.getMessage());
+        response.put(KEY_TIMESTAMP, LocalDateTime.now());
+        response.put(KEY_STATUS, HttpStatus.NOT_FOUND.value());
+        response.put(KEY_ERROR, MSG_NOT_FOUND);
+        response.put(KEY_MESSAGE, ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<Map<String, Object>> manejarConflict(ConflictException ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.CONFLICT.value());
-        response.put("error", "Conflict");
-        response.put("message", ex.getMessage());
+        response.put(KEY_TIMESTAMP, LocalDateTime.now());
+        response.put(KEY_STATUS, HttpStatus.CONFLICT.value());
+        response.put(KEY_ERROR, MSG_CONFLICT);
+        response.put(KEY_MESSAGE, ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, Object>> manejarBadCredentials(BadCredentialsException ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.UNAUTHORIZED.value());
-        response.put("error", "Unauthorized");
-        response.put("message", "Credenciales inválidas");
+        response.put(KEY_TIMESTAMP, LocalDateTime.now());
+        response.put(KEY_STATUS, HttpStatus.UNAUTHORIZED.value());
+        response.put(KEY_ERROR, MSG_UNAUTHORIZED);
+        response.put(KEY_MESSAGE, "Credenciales inválidas");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, Object>> manejarAccessDenied(AccessDeniedException ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.FORBIDDEN.value());
-        response.put("error", "Forbidden");
-        response.put("message", ex.getMessage());
+        response.put(KEY_TIMESTAMP, LocalDateTime.now());
+        response.put(KEY_STATUS, HttpStatus.FORBIDDEN.value());
+        response.put(KEY_ERROR, MSG_FORBIDDEN);
+        response.put(KEY_MESSAGE, ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
@@ -96,31 +109,31 @@ public class GlobalExceptionHandler {
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", "Bad Request");
-        response.put("message", "Error de validación");
-        response.put("details", detalles);
+        response.put(KEY_TIMESTAMP, LocalDateTime.now());
+        response.put(KEY_STATUS, HttpStatus.BAD_REQUEST.value());
+        response.put(KEY_ERROR, MSG_BAD_REQUEST);
+        response.put(KEY_MESSAGE, "Error de validación");
+        response.put(KEY_DETAILS, detalles);
         return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<Map<String, Object>> manejarNoResource(NoResourceFoundException ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.NOT_FOUND.value());
-        response.put("error", "Not Found");
-        response.put("message", ex.getMessage());
+        response.put(KEY_TIMESTAMP, LocalDateTime.now());
+        response.put(KEY_STATUS, HttpStatus.NOT_FOUND.value());
+        response.put(KEY_ERROR, MSG_NOT_FOUND);
+        response.put(KEY_MESSAGE, ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> manejarGenerico(Exception ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        response.put("error", "Internal Server Error");
-        response.put("message", ex.getMessage());
+        response.put(KEY_TIMESTAMP, LocalDateTime.now());
+        response.put(KEY_STATUS, HttpStatus.INTERNAL_SERVER_ERROR.value());
+        response.put(KEY_ERROR, MSG_INTERNAL_SERVER_ERROR);
+        response.put(KEY_MESSAGE, ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }
