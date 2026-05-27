@@ -21,7 +21,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "app.security.basic.username=admin",
         "app.security.basic.password=admin123"
 })
+@SuppressWarnings("java:S2068")
 class DepartamentoJwtSecurityIntegrationTest {
+
+    private static final String TEST_EMAIL = "empleado.demo@empresa.com";
 
     @Autowired
     private MockMvc mockMvc;
@@ -33,24 +36,24 @@ class DepartamentoJwtSecurityIntegrationTest {
     private JwtTokenProvider jwtTokenProvider;
 
     @Test
-    void sinToken_responde401() throws Exception {
+    void sinTokenResponde401() throws Exception {
         mockMvc.perform(get("/api/v1/departamentos"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void tokenInvalido_responde401() throws Exception {
+    void tokenInvalidoResponde401() throws Exception {
         mockMvc.perform(get("/api/v1/departamentos")
                         .header("Authorization", "Bearer token-invalido"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void autenticado_responde200() throws Exception {
+    void autenticadoResponde200() throws Exception {
         when(departamentoService.listar(eq(0), eq(10))).thenReturn(new DepartamentoPageResponse());
 
         mockMvc.perform(get("/api/v1/departamentos?page=0&size=10")
-                        .with(SecurityMockMvcRequestPostProcessors.user("empleado.demo@empresa.com").roles("EMPLEADO")))
+                        .with(SecurityMockMvcRequestPostProcessors.user(TEST_EMAIL).roles("EMPLEADO")))
                 .andExpect(status().isOk());
     }
 }

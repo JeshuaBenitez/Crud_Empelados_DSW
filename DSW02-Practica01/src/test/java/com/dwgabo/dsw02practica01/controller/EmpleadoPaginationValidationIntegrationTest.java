@@ -19,7 +19,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "app.security.basic.username=admin",
         "app.security.basic.password=admin123"
 })
+@SuppressWarnings("java:S2068")
 class EmpleadoPaginationValidationIntegrationTest {
+
+    private static final String TEST_EMAIL = "empleado.demo@empresa.com";
+    private static final String SIZE_ERROR = "El parámetro size debe estar entre 1 y 100";
 
     @Autowired
     private MockMvc mockMvc;
@@ -27,29 +31,29 @@ class EmpleadoPaginationValidationIntegrationTest {
     @MockBean
     private EmpleadoService empleadoService;
 
-        @MockBean
+    @MockBean
     private JwtTokenProvider jwtTokenProvider;
 
     @Test
-    void sinToken_responde401() throws Exception {
+    void sinTokenResponde401() throws Exception {
         mockMvc.perform(get("/api/v1/empleados?page=0&size=10"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void sizeMayorA100_responde400() throws Exception {
-        when(empleadoService.listarPropio("empleado.demo@empresa.com", 0, 101))
-                .thenThrow(new IllegalArgumentException("El parámetro size debe estar entre 1 y 100"));
+        void sizeMayorA100Responde400() throws Exception {
+        when(empleadoService.listarPropio(TEST_EMAIL, 0, 101))
+            .thenThrow(new IllegalArgumentException(SIZE_ERROR));
 
         mockMvc.perform(get("/api/v1/empleados?page=0&size=101")
-                        .with(SecurityMockMvcRequestPostProcessors.user("empleado.demo@empresa.com").roles("EMPLEADO")))
+                .with(SecurityMockMvcRequestPostProcessors.user(TEST_EMAIL).roles("EMPLEADO")))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void pageNoNumerico_responde400() throws Exception {
+    void pageNoNumericoResponde400() throws Exception {
         mockMvc.perform(get("/api/v1/empleados?page=abc&size=10")
-                        .with(SecurityMockMvcRequestPostProcessors.user("empleado.demo@empresa.com").roles("EMPLEADO")))
+                        .with(SecurityMockMvcRequestPostProcessors.user(TEST_EMAIL).roles("EMPLEADO")))
                 .andExpect(status().isBadRequest());
     }
 }

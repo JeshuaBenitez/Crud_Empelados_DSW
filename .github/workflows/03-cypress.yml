@@ -26,7 +26,7 @@ jobs:
           cache: npm
           cache-dependency-path: frontend-angular/package-lock.json
 
-      - run: npm ci
+      - run: npm ci --ignore-scripts
 
       - name: Run Cypress E2E (start server + tests)
         uses: cypress-io/github-action@v5

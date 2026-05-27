@@ -58,6 +58,8 @@ eval $(get_feature_paths)
 NEW_PLAN="$IMPL_PLAN"  # Alias for compatibility with existing code
 AGENT_TYPE="${1:-}"
 
+NEEDS_CLARIFICATION="NEEDS CLARIFICATION"
+
 # Agent-specific file paths  
 CLAUDE_FILE="$REPO_ROOT/CLAUDE.md"
 GEMINI_FILE="$REPO_ROOT/GEMINI.md"
@@ -91,19 +93,23 @@ NEW_PROJECT_TYPE=""
 #==============================================================================
 
 log_info() {
-    echo "INFO: $1"
+    local message="$1"
+    echo "INFO: $message"
 }
 
 log_success() {
-    echo "✓ $1"
+    local message="$1"
+    echo "✓ $message"
 }
 
 log_error() {
-    echo "ERROR: $1" >&2
+    local message="$1"
+    echo "ERROR: $message" >&2
 }
 
 log_warning() {
-    echo "WARNING: $1" >&2
+    local message="$1"
+    echo "WARNING: $message" >&2
 }
 
 # Cleanup function for temporary files
@@ -162,7 +168,7 @@ extract_plan_field() {
         head -1 | \
         sed "s|^\*\*${field_pattern}\*\*: ||" | \
         sed 's/^[ \t]*//;s/[ \t]*$//' | \
-        grep -v "NEEDS CLARIFICATION" | \
+        grep -v "$NEEDS_CLARIFICATION" | \
         grep -v "^N/A$" || echo ""
 }
 
@@ -212,8 +218,8 @@ format_technology_stack() {
     local parts=()
     
     # Add non-empty parts
-    [[ -n "$lang" && "$lang" != "NEEDS CLARIFICATION" ]] && parts+=("$lang")
-    [[ -n "$framework" && "$framework" != "NEEDS CLARIFICATION" && "$framework" != "N/A" ]] && parts+=("$framework")
+    [[ -n "$lang" && "$lang" != "$NEEDS_CLARIFICATION" ]] && parts+=("$lang")
+    [[ -n "$framework" && "$framework" != "$NEEDS_CLARIFICATION" && "$framework" != "N/A" ]] && parts+=("$framework")
     
     # Join with proper formatting
     if [[ ${#parts[@]} -eq 0 ]]; then
@@ -269,10 +275,9 @@ get_language_conventions() {
 }
 
 create_new_agent_file() {
-    local target_file="$1"
-    local temp_file="$2"
-    local project_name="$3"
-    local current_date="$4"
+    local temp_file="$1"
+    local project_name="$2"
+    local current_date="$3"
     
     if [[ ! -f "$TEMPLATE_FILE" ]]; then
         log_error "Template not found at $TEMPLATE_FILE"
@@ -384,14 +389,14 @@ update_existing_agent_file() {
         new_tech_entries+=("- $tech_stack ($CURRENT_BRANCH)")
     fi
     
-    if [[ -n "$NEW_DB" ]] && [[ "$NEW_DB" != "N/A" ]] && [[ "$NEW_DB" != "NEEDS CLARIFICATION" ]] && ! grep -q "$NEW_DB" "$target_file"; then
+    if [[ -n "$NEW_DB" ]] && [[ "$NEW_DB" != "N/A" ]] && [[ "$NEW_DB" != "$NEEDS_CLARIFICATION" ]] && ! grep -q "$NEW_DB" "$target_file"; then
         new_tech_entries+=("- $NEW_DB ($CURRENT_BRANCH)")
     fi
     
     # Prepare new change entry
     if [[ -n "$tech_stack" ]]; then
         new_change_entry="- $CURRENT_BRANCH: Added $tech_stack"
-    elif [[ -n "$NEW_DB" ]] && [[ "$NEW_DB" != "N/A" ]] && [[ "$NEW_DB" != "NEEDS CLARIFICATION" ]]; then
+    elif [[ -n "$NEW_DB" ]] && [[ "$NEW_DB" != "N/A" ]] && [[ "$NEW_DB" != "$NEEDS_CLARIFICATION" ]]; then
         new_change_entry="- $CURRENT_BRANCH: Added $NEW_DB"
     fi
     
@@ -413,7 +418,6 @@ update_existing_agent_file() {
     local tech_entries_added=false
     local changes_entries_added=false
     local existing_changes_count=0
-    local file_ended=false
     
     while IFS= read -r line || [[ -n "$line" ]]; do
         # Handle Active Technologies section
@@ -524,11 +528,9 @@ update_agent_file() {
     # Create directory if it doesn't exist
     local target_dir
     target_dir=$(dirname "$target_file")
-    if [[ ! -d "$target_dir" ]]; then
-        if ! mkdir -p "$target_dir"; then
-            log_error "Failed to create directory: $target_dir"
-            return 1
-        fi
+    if [[ ! -d "$target_dir" ]] && ! mkdir -p "$target_dir"; then
+        log_error "Failed to create directory: $target_dir"
+        return 1
     fi
     
     if [[ ! -f "$target_file" ]]; then
@@ -539,14 +541,8 @@ update_agent_file() {
             return 1
         }
         
-        if create_new_agent_file "$target_file" "$temp_file" "$project_name" "$current_date"; then
-            if mv "$temp_file" "$target_file"; then
-                log_success "Created new $agent_name context file"
-            else
-                log_error "Failed to move temporary file to $target_file"
-                rm -f "$temp_file"
-                return 1
-            fi
+        if create_new_agent_file "$temp_file" "$project_name" "$current_date" && mv "$temp_file" "$target_file"; then
+            log_success "Created new $agent_name context file"
         else
             log_error "Failed to create new agent file"
             rm -f "$temp_file"

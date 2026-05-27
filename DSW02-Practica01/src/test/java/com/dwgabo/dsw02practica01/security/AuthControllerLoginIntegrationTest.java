@@ -22,7 +22,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@SuppressWarnings("java:S2068")
 class AuthControllerLoginIntegrationTest {
+
+    private static final String TEST_EMAIL = "empleado.demo@empresa.com";
+    private static final String TEST_PASSWORD = "Empleado123!";
+    private static final String TOKEN_TYPE_BEARER = "Bearer";
 
     @Autowired
     private MockMvc mockMvc;
@@ -37,27 +42,27 @@ class AuthControllerLoginIntegrationTest {
     private JwtTokenProvider jwtTokenProvider;
 
     @Test
-    void loginExitoso_responde200ConBearer() throws Exception {
+    void loginExitosoResponde200ConBearer() throws Exception {
         LoginEmpleadoResponse response = new LoginEmpleadoResponse();
         response.setAccessToken("token-demo");
-        response.setTokenType("Bearer");
+        response.setTokenType(TOKEN_TYPE_BEARER);
         response.setExpiresIn(3600000L);
 
         when(authService.login(any(LoginEmpleadoRequest.class))).thenReturn(response);
 
         LoginEmpleadoRequest request = new LoginEmpleadoRequest();
-        request.setCorreo("empleado.demo@empresa.com");
-        request.setPassword("Empleado123!");
+        request.setCorreo(TEST_EMAIL);
+        request.setPassword(TEST_PASSWORD);
 
         mockMvc.perform(post("/api/v1/auth/empleados/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.tokenType").value("Bearer"));
+                .andExpect(jsonPath("$.tokenType").value(TOKEN_TYPE_BEARER));
     }
 
     @Test
-    void loginSinPayloadValido_responde400() throws Exception {
+    void loginSinPayloadValidoResponde400() throws Exception {
         mockMvc.perform(post("/api/v1/auth/empleados/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))

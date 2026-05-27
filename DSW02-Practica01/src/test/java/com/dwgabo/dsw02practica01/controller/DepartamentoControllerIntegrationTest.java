@@ -31,7 +31,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "app.security.basic.username=admin",
         "app.security.basic.password=admin123"
 })
+@SuppressWarnings("java:S2068")
 class DepartamentoControllerIntegrationTest {
+
+    private static final String TEST_EMAIL = "empleado.demo@empresa.com";
+    private static final String DEP_CLAVE = "DEP-1";
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,28 +50,29 @@ class DepartamentoControllerIntegrationTest {
     private JwtTokenProvider jwtTokenProvider;
 
     @Test
-    void crear_departamentoResponde201() throws Exception {
+    void crearDepartamentoResponde201() throws Exception {
         DepartamentoResponse response = new DepartamentoResponse();
-        response.setClave("DEP-1");
+        response.setClave(DEP_CLAVE);
         response.setNombre("Recursos Humanos");
 
         when(departamentoService.crear(any(CreateDepartamentoRequest.class))).thenReturn(response);
 
+        CreateDepartamentoRequest request = new CreateDepartamentoRequest();
+        request.setNombre("Recursos Humanos");
+
         mockMvc.perform(post("/api/v1/departamentos")
-                        .with(SecurityMockMvcRequestPostProcessors.user("empleado.demo@empresa.com").roles("EMPLEADO"))
+                        .with(SecurityMockMvcRequestPostProcessors.user(TEST_EMAIL).roles("EMPLEADO"))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new CreateDepartamentoRequest() {{
-                            setNombre("Recursos Humanos");
-                        }})))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.clave").value("DEP-1"));
+                .andExpect(jsonPath("$.clave").value(DEP_CLAVE));
     }
 
     @Test
-    void listar_departamentosResponde200() throws Exception {
+    void listarDepartamentosResponde200() throws Exception {
         DepartamentoResponse item = new DepartamentoResponse();
-        item.setClave("DEP-1");
+        item.setClave(DEP_CLAVE);
         item.setNombre("Operacion");
 
         DepartamentoPageResponse page = new DepartamentoPageResponse();
@@ -80,7 +85,7 @@ class DepartamentoControllerIntegrationTest {
         when(departamentoService.listar(eq(0), eq(10))).thenReturn(page);
 
         mockMvc.perform(get("/api/v1/departamentos?page=0&size=10")
-                        .with(SecurityMockMvcRequestPostProcessors.user("empleado.demo@empresa.com").roles("EMPLEADO")))
+                        .with(SecurityMockMvcRequestPostProcessors.user(TEST_EMAIL).roles("EMPLEADO")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].nombre").value("Operacion"));
     }

@@ -21,6 +21,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class DepartamentoServiceUs1Test {
 
+    private static final String DEP_CLAVE = "DEP-1";
+    private static final String DEP_PREFIX = "DEP";
+
     @Mock
     private DepartamentoRepository departamentoRepository;
 
@@ -31,7 +34,7 @@ class DepartamentoServiceUs1Test {
     private DepartamentoService departamentoService;
 
     @Test
-    void crear_departamentoConClaveDep() {
+    void crearDepartamentoConClaveDep() {
         CreateDepartamentoRequest request = new CreateDepartamentoRequest();
         request.setNombre("Recursos Humanos");
 
@@ -41,12 +44,12 @@ class DepartamentoServiceUs1Test {
 
         DepartamentoResponse response = departamentoService.crear(request);
 
-        assertEquals("DEP-1", response.getClave());
+        assertEquals(DEP_CLAVE, response.getClave());
         assertEquals("Recursos Humanos", response.getNombre());
     }
 
     @Test
-    void crear_nombreDuplicadoLanzaConflict() {
+    void crearNombreDuplicadoLanzaConflict() {
         CreateDepartamentoRequest request = new CreateDepartamentoRequest();
         request.setNombre("Operacion");
 
@@ -56,14 +59,14 @@ class DepartamentoServiceUs1Test {
     }
 
     @Test
-    void eliminar_conEmpleadosAsociadosLanzaConflict() {
+    void eliminarConEmpleadosAsociadosLanzaConflict() {
         Departamento departamento = new Departamento();
-        departamento.setId(new DepartamentoId("DEP", 1L));
+        departamento.setId(new DepartamentoId(DEP_PREFIX, 1L));
         departamento.setNombre("Operacion");
 
-        when(departamentoRepository.findById(new DepartamentoId("DEP", 1L))).thenReturn(java.util.Optional.of(departamento));
-        when(empleadoRepository.existsByDepartamento("DEP", 1L)).thenReturn(true);
+        when(departamentoRepository.findById(new DepartamentoId(DEP_PREFIX, 1L))).thenReturn(java.util.Optional.of(departamento));
+        when(empleadoRepository.existsByDepartamento(DEP_PREFIX, 1L)).thenReturn(true);
 
-        assertThrows(ConflictException.class, () -> departamentoService.eliminar("DEP-1"));
+        assertThrows(ConflictException.class, () -> departamentoService.eliminar(DEP_CLAVE));
     }
 }

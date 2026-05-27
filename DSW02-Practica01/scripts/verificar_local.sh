@@ -14,6 +14,7 @@ APP_BASIC_PASSWORD="${APP_BASIC_PASSWORD:-admin123}"
 APP_JWT_SECRET="${APP_JWT_SECRET:-jwt-secret-change-me-to-at-least-32-bytes-key}"
 APP_JWT_EXPIRATION_MS="${APP_JWT_EXPIRATION_MS:-3600000}"
 BASE_URL="${BASE_URL:-http://localhost:8080}"
+HTTP_CODE_FMT='%{http_code}'
 
 APP_PID=""
 
@@ -51,7 +52,7 @@ APP_PID=$!
 echo "[4/5] Esperando disponibilidad de la API..."
 READY=0
 for _ in {1..60}; do
-  CODE=$(curl -s -o /dev/null -w '%{http_code}' "$BASE_URL/swagger-ui.html" || true)
+  CODE=$(curl -s -o /dev/null -w "$HTTP_CODE_FMT" "$BASE_URL/swagger-ui.html" || true)
   if [[ "$CODE" == "200" || "$CODE" == "302" ]]; then
     READY=1
     break
@@ -60,45 +61,45 @@ for _ in {1..60}; do
 done
 
 if [[ "$READY" != "1" ]]; then
-  echo "[ERROR] La API no respondió a tiempo. Últimas líneas de log:"
+  echo "[ERROR] La API no respondió a tiempo. Últimas líneas de log:" >&2
   tail -n 80 "$LOG_FILE" || true
   exit 1
 fi
 
 echo "[5/5] Ejecutando smoke tests..."
-UNAUTH_CODE=$(curl -s -o /tmp/empleados_unauth.out -w '%{http_code}' "$BASE_URL/api/v1/empleados")
+UNAUTH_CODE=$(curl -s -o /tmp/empleados_unauth.out -w "$HTTP_CODE_FMT" "$BASE_URL/api/v1/empleados")
 LOGIN_BODY=$(curl -s -X POST "$BASE_URL/api/v1/auth/empleados/login" \
   -H 'Content-Type: application/json' \
   -d '{"correo":"empleado.demo@empresa.com","password":"Empleado123!"}')
 TOKEN=$(echo "$LOGIN_BODY" | sed -n 's/.*"accessToken":"\([^"]*\)".*/\1/p')
-AUTH_CODE=$(curl -s -o /tmp/empleados_auth.out -w '%{http_code}' "$BASE_URL/api/v1/empleados" -H "Authorization: Bearer $TOKEN")
-INVALID_CODE=$(curl -s -o /tmp/empleados_invalid.out -w '%{http_code}' "$BASE_URL/api/v1/empleados" -H 'Authorization: Bearer token-invalido')
-LOGIN_EMPTY_CODE=$(curl -s -o /tmp/login_empty.out -w '%{http_code}' -X POST "$BASE_URL/api/v1/auth/empleados/login" -H 'Content-Type: application/json' -d '{}')
+AUTH_CODE=$(curl -s -o /tmp/empleados_auth.out -w "$HTTP_CODE_FMT" "$BASE_URL/api/v1/empleados" -H "Authorization: Bearer $TOKEN")
+INVALID_CODE=$(curl -s -o /tmp/empleados_invalid.out -w "$HTTP_CODE_FMT" "$BASE_URL/api/v1/empleados" -H 'Authorization: Bearer token-invalido')
+LOGIN_EMPTY_CODE=$(curl -s -o /tmp/login_empty.out -w "$HTTP_CODE_FMT" -X POST "$BASE_URL/api/v1/auth/empleados/login" -H 'Content-Type: application/json' -d '{}')
 
 FAIL=0
 
 if [[ "$UNAUTH_CODE" != "401" ]]; then
-  echo "[ERROR] Esperado UNAUTH=401, obtenido $UNAUTH_CODE"
+  echo "[ERROR] Esperado UNAUTH=401, obtenido $UNAUTH_CODE" >&2
   FAIL=1
 fi
 
 if [[ -z "$TOKEN" ]]; then
-  echo "[ERROR] No se obtuvo accessToken en login. Respuesta: $LOGIN_BODY"
+  echo "[ERROR] No se obtuvo accessToken en login. Respuesta: $LOGIN_BODY" >&2
   FAIL=1
 fi
 
 if [[ "$AUTH_CODE" != "200" ]]; then
-  echo "[ERROR] Esperado AUTH=200, obtenido $AUTH_CODE"
+  echo "[ERROR] Esperado AUTH=200, obtenido $AUTH_CODE" >&2
   FAIL=1
 fi
 
 if [[ "$INVALID_CODE" != "401" ]]; then
-  echo "[ERROR] Esperado INVALID=401, obtenido $INVALID_CODE"
+  echo "[ERROR] Esperado INVALID=401, obtenido $INVALID_CODE" >&2
   FAIL=1
 fi
 
 if [[ "$LOGIN_EMPTY_CODE" != "400" ]]; then
-  echo "[ERROR] Esperado LOGIN_EMPTY=400, obtenido $LOGIN_EMPTY_CODE"
+  echo "[ERROR] Esperado LOGIN_EMPTY=400, obtenido $LOGIN_EMPTY_CODE" >&2
   FAIL=1
 fi
 
@@ -112,7 +113,7 @@ echo "- LOGIN_EMPTY_CODE=$LOGIN_EMPTY_CODE"
 
 if [[ "$FAIL" == "1" ]]; then
   echo ""
-  echo "[ERROR] Verificación completada con fallos"
+  echo "[ERROR] Verificación completada con fallos" >&2
   tail -n 60 "$LOG_FILE" || true
   exit 1
 fi
