@@ -46,7 +46,7 @@ jobs:
         run: npx ng test --watch=false --coverage --coverage-reporters=lcovonly
 
       - name: Compilar backend para generar binarios Java
-        run: mvn -B --no-transfer-progress -DskipTests compile
+        run: mvn -B --no-transfer-progress -DskipTests -f DSW02-Practica01/pom.xml compile
 
       - name: Ejecutar SonarCloud Scanner
         uses: SonarSource/sonarcloud-github-action@v2.3.0
