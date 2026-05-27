@@ -1,5 +1,5 @@
 name: 01-CI
-# Trigger run comment
+# Trigger run: verify workflows chain
 
 on:
   push:
