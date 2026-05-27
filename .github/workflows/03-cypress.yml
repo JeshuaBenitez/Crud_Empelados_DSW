@@ -1,0 +1,61 @@
+name: 03 Cypress
+
+on:
+  repository_dispatch:
+    types:
+      - chain-cypress
+
+permissions:
+  contents: write
+
+jobs:
+  cypress-e2e:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.client_payload.branch == 'deploy' }}
+    defaults:
+      run:
+        working-directory: frontend-angular
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.client_payload.sha }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend-angular/package-lock.json
+
+      - run: npm ci
+
+      - name: Run Cypress E2E (start server + tests)
+        uses: cypress-io/github-action@v5
+        with:
+          working-directory: frontend-angular
+          start: npx ng serve --port 8088
+          wait-on: 'http://localhost:8088'
+          wait-on-timeout: 120000
+          command: npx cypress run --spec cypress/e2e/auth/login-crud-empleados.localhost8088.cy.ts --config baseUrl=http://localhost:8088
+
+      - name: Upload Cypress screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: frontend-angular/cypress/screenshots
+          if-no-files-found: ignore
+
+      - name: Disparar 04 Docker Hub
+        if: ${{ success() }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createDispatchEvent({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              event_type: 'chain-docker',
+              client_payload: {
+                sha: context.payload.client_payload.sha,
+                branch: context.payload.client_payload.branch
+              }
+            });
